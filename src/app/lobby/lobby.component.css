@@ -1,0 +1,17 @@
+#form, #table {
+    margin: auto;
+}
+
+section {
+    height: 100%;
+}
+
+#form {
+    border: 5px solid red;
+}
+
+#table {
+    border: 5px solid blue;
+    width: 100%;
+}
+
