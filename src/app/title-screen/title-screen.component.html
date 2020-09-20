@@ -3,12 +3,12 @@
         <h1>Tic Tac Toe & Connect 4</h1>
     </section>
     <section id="form">
-        <div>
+        <form #f="ngForm" (ngSubmit)="onOkay(f)" >
             <mat-form-field>
-                <input matNativeControl required placeholder="Enter Username">
+                <input matNativeControl ngModel name="username" required placeholder="Enter Username">
             </mat-form-field>
             <mat-error></mat-error>
-            <button mat-raised-button color="primary" routerLink="/lobby">Okay</button>
-        </div>
+            <button mat-raised-button [disabled]="f.invalid || f.pristine" color="primary">Okay</button>
+        </form>
     </section>
 </main>

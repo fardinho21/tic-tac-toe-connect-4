@@ -1,0 +1,20 @@
+form, section{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    
+}
+section, div {
+    width: 100%;
+}
+
+div {
+    display: flex;
+    justify-content: space-evenly;
+    /* border: 5px solid blue; */
+}
+
+button {
+    margin: 1rem;
+}

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { NgForm } from "@angular/forms";
 import { Router } from '@angular/router';
 
 @Component({
@@ -8,13 +9,13 @@ import { Router } from '@angular/router';
 })
 export class TitleScreenComponent implements OnInit {
 
-  constructor() { }
+  constructor(private router: Router) { }
 
   ngOnInit(): void {
   }
 
-  onOkay() {
-    console.log("okay")
+  onOkay(form : NgForm) {
+    this.router.navigate(['/lobby'])
   }
 
 }

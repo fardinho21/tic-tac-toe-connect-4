@@ -1,13 +1,14 @@
 <main>
-    <section id="table">
-        <mat-table [dataSource]="data">
 
-            <ng-container matColumnDef="playerName">
+    <section id="table">
+        <mat-table [dataSource]="dataSource">
+
+            <ng-container matColumnDef="gameName">
                 <mat-header-cell *matHeaderCellDef>
-                    Player Name
+                    Game Name
                 </mat-header-cell>
                 <mat-cell *matCellDef="let element">
-                    {{element.name}}
+                    {{element.gameName}}
                 </mat-cell>
             </ng-container>
 
@@ -20,16 +21,29 @@
                 </mat-cell>
             </ng-container>
 
+            <ng-container matColumnDef="playerName">
+                <mat-header-cell *matHeaderCellDef>
+                    Player Name
+                </mat-header-cell>
+                <mat-cell *matCellDef="let element">
+                    {{element.playerName}}
+                </mat-cell>
+            </ng-container>
+
             <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-            <mat-row *matRowDef="let row; columns: displayedColumns">
+            <mat-row *matRowDef="let row; columns: displayedColumns" (click)="onClickRow(row)">
 
             </mat-row>
         </mat-table>
     </section>
 
-
     <section id="form">
         <!-- form controls -->
-        <p>Eos est ut stet amet elitr stet est sit et amet. Sea sea erat et accusam diam. Erat ea sanctus magna tempor aliquyam at clita. Sit labore duo duo erat kasd nonumy. Sadipscing no sit eos lorem, labore invidunt et est ut rebum, est et dolore est nonumy lorem dolor ut, invidunt vero labore stet et duo erat, et dolor ut magna justo erat labore aliquyam, sed ipsum justo ea diam dolor et stet invidunt dolor, sed aliquyam nonumy ipsum eirmod gubergren clita dolore et, sadipscing no erat dolore magna justo magna labore gubergren clita. Et duo dolor dolor ipsum.</p>
+        <div>
+            <button mat-flat-button color="accent" type="button" routerLink="/">Exit</button>
+            <button mat-raised-button color="primary" type="button" (click)="onHostGame()">Host Game</button>
+        </div>
+
     </section>
+
 </main>

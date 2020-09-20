@@ -10,12 +10,16 @@ import { MaterialModule } from "./material.module";
 import { AppComponent } from './app.component';
 import { TitleScreenComponent } from './title-screen/title-screen.component';
 import { LobbyComponent } from "./lobby/lobby.component";
+import { HostGameComponent } from "./lobby/host-game/host-game.component";
+import { JoinGameComponent } from "./lobby/join-game/join-game.component";
+import { FormsModule } from '@angular/forms';
 
 
 declare global {
   export interface GameInfo {
     playerName: string;
     gameType: string;
+    gameName: string;
   }
 }
 
@@ -23,15 +27,19 @@ declare global {
   declarations: [
     AppComponent,
     TitleScreenComponent,
-    LobbyComponent
+    LobbyComponent,
+    HostGameComponent,
+    JoinGameComponent
   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
+    FormsModule,
     RoutingModule,
     MaterialModule
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  entryComponents: [HostGameComponent, JoinGameComponent]
 })
 export class AppModule { }

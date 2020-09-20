@@ -35,22 +35,22 @@ section {
     transform: translate(-50%, -50%);
 }
 
-div {
+form {
     display: flex;
 }
-div button{
+form button{
     margin: auto;
     margin-left: 2rem;
     
 }
 
 @media (max-width: 500px) {
-    div {
+    form {
         display: flex;
         flex-direction: column;
     }
 
-    div button {
+    form button {
         margin: 0px;
     }
 }
