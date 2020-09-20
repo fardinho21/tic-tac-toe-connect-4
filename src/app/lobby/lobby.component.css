@@ -26,12 +26,12 @@ div {
         align-items: center;
         text-align: center;
         justify-content: center;
-
+        height: 100%;
+        
     }
 
     div button {
-        margin-top: 50%;
-        margin-bottom: 50%;
+        margin: auto;
     }
     
 
@@ -44,7 +44,8 @@ div {
         width: 20%;
     }
     #table {
-        width: 80%
+        width: 80%;
+        
     }
 
 

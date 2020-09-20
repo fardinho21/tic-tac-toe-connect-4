@@ -1,0 +1,26 @@
+<h4 mat-dialog-title>Against PC</h4>
+<form #f="ngForm" (ngSubmit)="onSubmit(f)">
+
+    <mat-form-field>
+        <mat-label>Game Type</mat-label>
+        <mat-select required apperance="fill">
+            <mat-option value="TTT">
+                Tic-Tac-Toe
+            </mat-option>
+            <mat-option value="CF">
+                Connect 4
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <section>
+        <button mat-flat-button mat-dialog-close color="acccent" type="button">
+            Back
+        </button>
+        <button mat-flat-button color="primary">
+            Okay
+        </button>
+    </section>
+
+
+</form>

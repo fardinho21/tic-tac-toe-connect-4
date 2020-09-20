@@ -1,18 +1,18 @@
 
 <h4 mat-dialog-title>Host Game</h4>
-<form >
+<form #f="ngForm" (ngSubmit)="onStart(f)">
 
     <mat-form-field>
-        <input matNativeControl placeholder="Game Name" type="text">
+        <input matNativeControl required ngModel name="gameName" minlength="10" placeholder="Game Name" type="text">
     </mat-form-field>
 
     <mat-form-field>
         <mat-label>Game Type</mat-label>
-        <mat-select apperance="fill">
-            <mat-option value="tic-tac-toe">
+        <mat-select required apperance="fill">
+            <mat-option value="TTT">
                 Tic-Tac-Toe
             </mat-option>
-            <mat-option value="connect-four">
+            <mat-option value="CF">
                 Connect 4
             </mat-option>
         </mat-select>
@@ -20,7 +20,7 @@
 
     <div>
         <button mat-flat-button mat-dialog-close color="accent" type="button">Cancel</button>
-        <button mat-flat-button color="primary" type="button">Start</button>
+        <button mat-flat-button [disabled]="f.invalid || f.pristine" color="primary">Start</button>
     </div>
 
 

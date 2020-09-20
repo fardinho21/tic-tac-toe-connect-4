@@ -1,1 +1,15 @@
-<p>game works!</p>
+<main>
+
+    <section id="canvasContainer">
+        <canvas #canvas [width]='canvasWidth' [height]='canvasHeight' style="border: 5px solid red;">
+
+        </canvas>
+    </section>
+
+
+    <section id="buttons">
+        <button mat-flat-button color="accent" type="button" (click)="onQuitGame()">Quit Game</button>
+        <button mat-flat-button color="primary" type="button">Confirm Move</button>
+    </section>
+
+</main>

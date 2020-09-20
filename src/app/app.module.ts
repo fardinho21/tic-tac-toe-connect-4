@@ -5,14 +5,16 @@ import { NgModule } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RoutingModule } from "./routing.module";
 import { MaterialModule } from "./material.module";
-
+import { FormsModule } from '@angular/forms';
 //components
 import { AppComponent } from './app.component';
 import { TitleScreenComponent } from './title-screen/title-screen.component';
 import { LobbyComponent } from "./lobby/lobby.component";
 import { HostGameComponent } from "./lobby/host-game/host-game.component";
 import { JoinGameComponent } from "./lobby/join-game/join-game.component";
-import { FormsModule } from '@angular/forms';
+import { QuitGameComponent } from "./game/quit-game/quit-game.component";
+import { AgainstPcComponent } from "./lobby/against-pc/against-pc.component";
+import { GameComponent } from "./game/game.component";
 
 
 declare global {
@@ -28,8 +30,11 @@ declare global {
     AppComponent,
     TitleScreenComponent,
     LobbyComponent,
+    GameComponent,
     HostGameComponent,
-    JoinGameComponent
+    JoinGameComponent, 
+    QuitGameComponent,
+    AgainstPcComponent
   ],
   imports: [
     BrowserModule,
@@ -40,6 +45,6 @@ declare global {
   ],
   providers: [],
   bootstrap: [AppComponent],
-  entryComponents: [HostGameComponent, JoinGameComponent]
+  entryComponents: [HostGameComponent, JoinGameComponent, QuitGameComponent, AgainstPcComponent]
 })
 export class AppModule { }

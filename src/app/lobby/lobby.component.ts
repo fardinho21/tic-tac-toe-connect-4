@@ -1,8 +1,16 @@
-import { Component, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
+//components
 import { HostGameComponent } from "./host-game/host-game.component";
 import { JoinGameComponent } from "./join-game/join-game.component";
+import { AgainstPcComponent } from "./against-pc/against-pc.component";
+//services
+import { ManagerService } from "../shared/manager.service";
+import { GameManagerService } from '../shared/game-manager.service';
+//rxjs
+import { Subscription } from 'rxjs';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -10,25 +18,54 @@ import { JoinGameComponent } from "./join-game/join-game.component";
   templateUrl: './lobby.component.html',
   styleUrls: ['./lobby.component.css']
 })
-export class LobbyComponent implements OnInit {
+export class LobbyComponent implements OnInit, OnDestroy {
 
+  //subscriptions
+  gameInfoSubscription : Subscription;
+
+  
   dataSource = new MatTableDataSource<GameInfo>();
   displayedColumns = ["gameName" ,"playerName", "gameType"];
+  private dialogRef : MatDialogRef<HostGameComponent | JoinGameComponent | AgainstPcComponent>;
 
-  constructor(private dialog : MatDialog) { }
+  constructor(
+    private dialog : MatDialog, 
+    private manager: ManagerService, 
+    private gameManager: GameManagerService,
+    private router: Router) { }
 
   ngOnInit(): void {
     this.dataSource.data = [
       {playerName: "funkMaster100", gameType: "TicTacToe", gameName: "You cant beat"},
       {playerName: "connect4Mstr", gameType: "Connect4", gameName: "Casual"}
-    ];
+    ];//dummy data
+
+    this.gameInfoSubscription = this.gameManager.gameInfoSubject.subscribe(gameInfo => {
+      //check close the dialog
+      if (this.dialogRef) {
+        this.dialogRef.close();
+        this.dialogRef = null;
+      }
+
+      //navigate
+      this.router.navigate(['/game'])
+
+    })
+  }
+
+  ngOnDestroy() {
+    this.gameInfoSubscription.unsubscribe();
   }
 
   onHostGame() {
-    this.dialog.open(HostGameComponent);
+    this.dialogRef = this.dialog.open(HostGameComponent); 
+  }
+
+  onAgainstPC() {
+    this.dialogRef = this.dialog.open(AgainstPcComponent);
   }
 
   onClickRow(row : GameInfo) {
-    this.dialog.open(JoinGameComponent, {data: row});
+    this.dialogRef = this.dialog.open(JoinGameComponent, {data: row});
   }
 }

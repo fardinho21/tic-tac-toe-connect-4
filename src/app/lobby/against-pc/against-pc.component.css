@@ -1,18 +1,12 @@
 main {
     display: flex;
     flex-direction: column;
+    justify-content: center;
 }
 
-#canvasContainer  {
+section {
     display: flex;
     justify-content: center;
-    height: 80%;
-}
-
-#buttons {
-    display: flex;
-    justify-content: space-evenly;
-    height: 20%;
 }
 
 button {
