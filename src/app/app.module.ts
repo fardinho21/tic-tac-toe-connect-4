@@ -23,6 +23,10 @@ declare global {
     gameType: string;
     gameName: string;
   }
+  export interface BoardPiece {
+    isValid: boolean;
+    index: number;
+  }
 }
 
 @NgModule({

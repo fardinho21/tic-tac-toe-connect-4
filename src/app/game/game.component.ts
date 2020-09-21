@@ -21,8 +21,7 @@ export class GameComponent implements OnInit, OnDestroy, AfterViewInit {
   private canvas : HTMLCanvasElement;
   private context : CanvasRenderingContext2D;
   private dialogRef: MatDialogRef<QuitGameComponent>;
-  canvasWidth = 450;
-  canvasHeight = 450;
+  private playerPiece : string = "x";
 
   constructor(private gameManager: GameManagerService, private dialog: MatDialog, private router: Router) { }
 
@@ -42,7 +41,8 @@ export class GameComponent implements OnInit, OnDestroy, AfterViewInit {
 
   ngAfterViewInit() {
     this.canvas = this.canvasElRef.nativeElement;
-    this.canvasWidth = window.innerWidth*0.7;
+    this.canvas.width = window.innerWidth*0.7;
+    this.canvas.height = window.innerHeight*0.8;
     this.gameManager.startGame(this.canvas);
 
     this.canvasSubscription = this.gameManager.board.canvasSubject.subscribe((canvas : HTMLCanvasElement) => {
@@ -52,10 +52,23 @@ export class GameComponent implements OnInit, OnDestroy, AfterViewInit {
 
   @HostListener('window:resize', ['$event'])
   onResize(event){
-    this.gameManager.board.setCanvasDimensions(window.innerWidth*0.7)
+    this.gameManager.board.setCanvasDimensions(window.innerWidth*0.7, window.innerHeight*0.8)
     this.gameManager.board.drawBoard()
   }
 
+  onCanvasClick(event : MouseEvent) {
+    let rect = this.canvas.getBoundingClientRect()
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    //console.log(event.clientX - rect.left, event.clientY - rect.top);
+    let boardPiece : BoardPiece = this.gameManager.board.clickBoard(x,y)
+
+    if (boardPiece.isValid){
+      this.gameManager.board.placePiece(boardPiece,this.playerPiece)
+    } else {
+      
+    }
+  }
 
   onConfirmMove() {
 
