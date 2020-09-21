@@ -13,11 +13,10 @@ import { QuitGameComponent } from './quit-game/quit-game.component';
 })
 export class GameComponent implements OnInit, OnDestroy, AfterViewInit {
 
-  private gameInfoSubscription : Subscription;
+  private gameInfoSubscription : Subscription; 
+  private canvasSubscription : Subscription;
 
-  
-
-  @ViewChild('canvas')
+  @ViewChild('canvas', {static: false})
   private canvasElRef: ElementRef<HTMLCanvasElement>;
   private canvas : HTMLCanvasElement;
   private context : CanvasRenderingContext2D;
@@ -28,31 +27,35 @@ export class GameComponent implements OnInit, OnDestroy, AfterViewInit {
   constructor(private gameManager: GameManagerService, private dialog: MatDialog, private router: Router) { }
 
   ngOnInit(): void {
+
+
     this.gameInfoSubscription = this.gameManager.gameInfoSubject.subscribe(gameInfo => {
       this.dialogRef.close();
       this.router.navigate(['/lobby'])
     })
-
-    this.gameManager.board.canvasContextSubject.subscribe((canvas : HTMLCanvasElement) => {
-      this.canvas = canvas
-    })
-
-    this.canvasWidth = window.innerWidth*0.7;
-    this.gameManager.startGame();
-  }
-
-  @HostListener('window:resize', ['$event'])
-  onResize(event){
-    //this.canvasWidth = window.innerWidth*0.70;
   }
 
   ngOnDestroy() {
     this.gameInfoSubscription.unsubscribe();
+    this.canvasSubscription.unsubscribe();
   }
 
   ngAfterViewInit() {
+    this.canvas = this.canvasElRef.nativeElement;
+    this.canvasWidth = window.innerWidth*0.7;
+    this.gameManager.startGame(this.canvas);
 
+    this.canvasSubscription = this.gameManager.board.canvasSubject.subscribe((canvas : HTMLCanvasElement) => {
+      this.canvas = canvas
+    })
   }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event){
+    this.gameManager.board.setCanvasDimensions(window.innerWidth*0.7)
+    this.gameManager.board.drawBoard()
+  }
+
 
   onConfirmMove() {
 

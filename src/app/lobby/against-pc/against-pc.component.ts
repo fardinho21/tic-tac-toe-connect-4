@@ -17,7 +17,7 @@ export class AgainstPcComponent implements OnInit {
   onSubmit(form : NgForm) {
 
     const gInfo : GameInfo = {
-      gameName: form.value.gameName,
+      gameName: "name",
       gameType: form.value.gameType,
       playerName: 'name'
     }

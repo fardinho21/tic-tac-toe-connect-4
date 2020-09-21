@@ -1,11 +1,19 @@
 import { Subject } from "rxjs";
+
 abstract class Board {
+
+    constructor(canvas : HTMLCanvasElement) {
+        this.canvas = canvas;
+        this.context = canvas.getContext('2d');
+        this.setCanvasDimensions(this.canvas.width,this.canvas.height);
+        this.drawBoard();
+    }
 
     public boardArray = []
 
-    public canvas = new HTMLCanvasElement();
-    public context : CanvasRenderingContext2D = this.canvas.getContext('2d');
-    public canvasContextSubject = new Subject<HTMLCanvasElement>();
+    public canvas : HTMLCanvasElement;
+    public context : CanvasRenderingContext2D;
+    public canvasSubject = new Subject<HTMLCanvasElement>();
 
     abstract async checkForWinner();
 
@@ -26,7 +34,7 @@ abstract class Board {
         this.boardArray=[];
     }
     
-    setCanvasDimensions(width: number, height: number) {
+    setCanvasDimensions(width=this.canvas.width, height=this.canvas.height) {
         this.canvas.width = width;
         this.canvas.height = height;
     }
@@ -34,6 +42,9 @@ abstract class Board {
 
 export class TicTacToeBoard extends Board{
     
+    constructor(canvas : HTMLCanvasElement) {
+        super(canvas);
+    }
 
     checkForWinner() {
         let checkDiag1 = (this.boardArray[0] === this.boardArray[4]) && (this.boardArray[0] === this.boardArray[7])
@@ -65,11 +76,36 @@ export class TicTacToeBoard extends Board{
     drawBoard() {
 
 
-        this.canvasContextSubject.next(this.canvas);
+        let i = this.canvas.width/3
+        while (i < this.canvas.width) {
+            this.context.beginPath() 
+            this.context.moveTo(i,0);
+            this.context.lineTo(i,this.canvas.height);
+            i+=this.canvas.width/3;
+            this.context.stroke()
+        }
+
+        i = this.canvas.height/3
+
+        while (i < this.canvas.height) {
+            this.context.beginPath() 
+            this.context.moveTo(0,i);
+            this.context.lineTo(this.canvas.width,i);
+            i+=this.canvas.height/3;
+            this.context.stroke()
+        }
+
+
+        this.canvasSubject.next(this.canvas);
     }
+
 }
 
 export class ConnectFourBoard extends Board{
+
+    constructor(canvas : HTMLCanvasElement) {
+        super(canvas);
+    }
 
     checkForWinner() {
 
@@ -78,7 +114,7 @@ export class ConnectFourBoard extends Board{
     drawBoard() {
 
 
-        this.canvasContextSubject.next(this.canvas);
+        this.canvasSubject.next(this.canvas);
     }
     
 }

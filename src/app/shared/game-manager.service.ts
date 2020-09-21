@@ -28,12 +28,12 @@ export class GameManagerService {
     this.clearGameInfo();
   }
 
-  startGame() {
+  startGame(canvas : HTMLCanvasElement) {
     //set the board
     if (this.gameInfo.gameType === "TTT") {
-      this.board = new TicTacToeBoard();
+      this.board = new TicTacToeBoard(canvas);
     } else if (this.gameInfo.gameType === "CF") {
-      this.board = new ConnectFourBoard();
+      this.board = new ConnectFourBoard(canvas);
     }
 
   }
