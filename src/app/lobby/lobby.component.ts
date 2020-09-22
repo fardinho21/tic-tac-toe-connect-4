@@ -5,6 +5,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { HostGameComponent } from "./host-game/host-game.component";
 import { JoinGameComponent } from "./join-game/join-game.component";
 import { AgainstPcComponent } from "./against-pc/against-pc.component";
+import { WaitingComponent } from "./waiting/waiting.component";
 //services
 import { ManagerService } from "../shared/manager.service";
 import { GameManagerService } from '../shared/game-manager.service';
@@ -26,7 +27,7 @@ export class LobbyComponent implements OnInit, OnDestroy {
   
   dataSource = new MatTableDataSource<GameInfo>();
   displayedColumns = ["gameName" ,"playerName", "gameType"];
-  private dialogRef : MatDialogRef<HostGameComponent | JoinGameComponent | AgainstPcComponent>;
+  private dialogRef : MatDialogRef<HostGameComponent | JoinGameComponent | AgainstPcComponent | WaitingComponent>;
 
   constructor(
     private dialog : MatDialog, 
@@ -48,7 +49,16 @@ export class LobbyComponent implements OnInit, OnDestroy {
       }
 
       //navigate
-      this.router.navigate(['/game'])
+      if (gameInfo.host) {
+        this.dialogRef = this.dialog.open(WaitingComponent, {data : {message: "Waiting for opponent."}})
+
+        setTimeout(() => {
+          this.dialogRef.close()
+          this.dialogRef = null;
+          this.router.navigate(['/game'])
+        }, 4000);
+      }
+
 
     })
   }
@@ -58,7 +68,7 @@ export class LobbyComponent implements OnInit, OnDestroy {
   }
 
   onHostGame() {
-    this.dialogRef = this.dialog.open(HostGameComponent); 
+    this.dialogRef = this.dialog.open(HostGameComponent);
   }
 
   onAgainstPC() {

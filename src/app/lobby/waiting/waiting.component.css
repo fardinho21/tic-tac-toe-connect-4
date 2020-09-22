@@ -1,5 +1,10 @@
 main {
     display: flex;
     flex-direction: column;
-    justify-content: space-around;
+}
+
+#spinner {
+    width: 50%;
+    height: 50%;
+    
 }

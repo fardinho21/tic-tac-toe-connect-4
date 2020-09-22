@@ -1,0 +1,15 @@
+<h4 mat-dialog-title> Join Game</h4>
+<main >
+
+    <section>
+        <p>{{message.message}}</p>
+    </section>
+
+    <section id="spinner">
+        <app-loading></app-loading>
+    </section>
+
+    <div >
+        <button mat-flat-button mat-dialog-close color="accent" type="button" (click)="onBack()" >Back</button>
+    </div>
+</main>

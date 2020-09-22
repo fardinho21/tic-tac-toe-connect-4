@@ -13,7 +13,10 @@ import { LobbyComponent } from "./lobby/lobby.component";
 import { HostGameComponent } from "./lobby/host-game/host-game.component";
 import { JoinGameComponent } from "./lobby/join-game/join-game.component";
 import { QuitGameComponent } from "./game/quit-game/quit-game.component";
+import { NotValidComponent } from "./game/not-valid/not-valid.component";
 import { AgainstPcComponent } from "./lobby/against-pc/against-pc.component";
+import { WaitingComponent } from "./lobby/waiting/waiting.component"
+import { LoadingComponent } from "./shared/loading/loading.component";
 import { GameComponent } from "./game/game.component";
 
 
@@ -22,6 +25,7 @@ declare global {
     playerName: string;
     gameType: string;
     gameName: string;
+    host?: boolean;
   }
   export interface BoardPiece {
     isValid: boolean;
@@ -38,7 +42,11 @@ declare global {
     HostGameComponent,
     JoinGameComponent, 
     QuitGameComponent,
-    AgainstPcComponent
+    AgainstPcComponent,
+    LoadingComponent,
+    WaitingComponent,
+    
+    NotValidComponent
   ],
   imports: [
     BrowserModule,
@@ -49,6 +57,13 @@ declare global {
   ],
   providers: [],
   bootstrap: [AppComponent],
-  entryComponents: [HostGameComponent, JoinGameComponent, QuitGameComponent, AgainstPcComponent]
+  entryComponents: [
+    HostGameComponent, 
+    JoinGameComponent, 
+    QuitGameComponent, 
+    AgainstPcComponent,
+    WaitingComponent,
+    NotValidComponent
+  ]
 })
 export class AppModule { }

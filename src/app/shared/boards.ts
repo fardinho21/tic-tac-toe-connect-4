@@ -1,4 +1,3 @@
-import { jitOnlyGuardedExpression } from '@angular/compiler/src/render3/util';
 import { Subject } from "rxjs";
 
 export abstract class Board {
@@ -49,6 +48,7 @@ export abstract class Board {
 
     resetBoard() {
         this.boardArray=[];
+        this.drawBoard();
     }
     
     setCanvasDimensions(width=this.canvas.width, height=this.canvas.height) {
@@ -129,7 +129,7 @@ export class TicTacToeBoard extends Board{
         let widthOfOneSpot = this.canvas.width/this.numberOfSpotsInRow;
         let heightOfOneSpot = this.canvas.height/this.numberOfSpotsInCol;
         let arrayIndex = this.getArrayIndexFromRowAndCol(i,j);
-        
+        this.context.lineWidth = 5;
         while (arrayIndex < this.boardArray.length ) {
             
             let piece = this.boardArray[arrayIndex];
@@ -146,7 +146,11 @@ export class TicTacToeBoard extends Board{
                 this.context.lineTo(widthOfOneSpot*(j+0.75),heightOfOneSpot*(i+0.75));
 
             } else if (piece === "o") {
-                this.context.arc(widthOfOneSpot*(j+0.5),heightOfOneSpot*(i+0.5),widthOfOneSpot*0.25,0,2*Math.PI);
+                this.context.ellipse(
+                    widthOfOneSpot*(j+0.5),
+                    heightOfOneSpot*(i+0.5),
+                    widthOfOneSpot*0.25,
+                    heightOfOneSpot*0.25,0,0,Math.PI*2);
             }
             this.context.stroke();
             j++;
@@ -162,7 +166,7 @@ export class TicTacToeBoard extends Board{
             }
             arrayIndex = this.getArrayIndexFromRowAndCol(i,j);
         }
-
+        this.context.lineWidth = 1;
 
 
 

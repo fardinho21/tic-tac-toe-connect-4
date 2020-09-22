@@ -21,7 +21,8 @@ export class HostGameComponent implements OnInit {
     const gInfo : GameInfo = {
       gameName: form.value.gameName,
       gameType: form.value.gameType,
-      playerName: 'name'
+      playerName: 'name',
+      host: true
     }
     this.gameManager.hostGame(gInfo);
 

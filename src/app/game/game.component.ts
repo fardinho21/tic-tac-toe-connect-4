@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { GameManagerService } from '../shared/game-manager.service';
 import { QuitGameComponent } from './quit-game/quit-game.component';
-
+import { NotValidComponent } from './not-valid/not-valid.component';
 
 @Component({
   selector: 'app-game',
@@ -20,8 +20,8 @@ export class GameComponent implements OnInit, OnDestroy, AfterViewInit {
   private canvasElRef: ElementRef<HTMLCanvasElement>;
   private canvas : HTMLCanvasElement;
   private context : CanvasRenderingContext2D;
-  private dialogRef: MatDialogRef<QuitGameComponent>;
-  private playerPiece : string = "x";
+  private dialogRef: MatDialogRef<QuitGameComponent | NotValidComponent>;
+  private playerPiece : string = "o";
 
   constructor(private gameManager: GameManagerService, private dialog: MatDialog, private router: Router) { }
 
@@ -67,7 +67,7 @@ export class GameComponent implements OnInit, OnDestroy, AfterViewInit {
       this.gameManager.board.placePiece(boardPiece,this.playerPiece)
       this.gameManager.board.drawBoardAndPieces();
     } else {
-      console.log("not a valid postition")
+      this.dialogRef = this.dialog.open(NotValidComponent);
     }
   }
 
