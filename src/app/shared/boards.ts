@@ -1,3 +1,4 @@
+import { jitOnlyGuardedExpression } from '@angular/compiler/src/render3/util';
 import { Subject } from "rxjs";
 
 export abstract class Board {
@@ -9,7 +10,6 @@ export abstract class Board {
         this.numberOfSpotsInCol = numSpotsInCol
         this.boardArray = new Array(numSpotsInRow*this.numberOfSpotsInCol);
         this.setCanvasDimensions(this.canvas.width,this.canvas.height);
-        this.drawBoardAndPieces();
     }
 
     public boardArray = [] //stroes the pieces
@@ -61,6 +61,9 @@ export class TicTacToeBoard extends Board{
     
     constructor(canvas : HTMLCanvasElement) {
         super(canvas, 3, 3);
+        this.boardArray[0]="x";
+        this.drawBoardAndPieces();
+        console.log(this.boardArray);
     }
 
     checkForWinner() {
@@ -121,14 +124,61 @@ export class TicTacToeBoard extends Board{
 
     drawPieces() {
 
+        let i = 0;
+        let j = 0;
+        let widthOfOneSpot = this.canvas.width/this.numberOfSpotsInRow;
+        let heightOfOneSpot = this.canvas.height/this.numberOfSpotsInCol;
+        let arrayIndex = this.getArrayIndexFromRowAndCol(i,j);
+        
+        while (arrayIndex < this.boardArray.length ) {
+            
+            let piece = this.boardArray[arrayIndex];
+            this.context.beginPath()
+            if (piece === "x") {
+
+                this.context.moveTo(widthOfOneSpot*(j+0.5),heightOfOneSpot*(i+0.5));
+                this.context.lineTo(widthOfOneSpot*(j+0.25),heightOfOneSpot*(i+0.25));
+                this.context.moveTo(widthOfOneSpot*(j+0.5),heightOfOneSpot*(i+0.5));
+                this.context.lineTo(widthOfOneSpot*(j+0.75),heightOfOneSpot*(i+0.25));
+                this.context.moveTo(widthOfOneSpot*(j+0.5),heightOfOneSpot*(i+0.5));
+                this.context.lineTo(widthOfOneSpot*(j+0.25),heightOfOneSpot*(i+0.75));
+                this.context.moveTo(widthOfOneSpot*(j+0.5),heightOfOneSpot*(i+0.5));
+                this.context.lineTo(widthOfOneSpot*(j+0.75),heightOfOneSpot*(i+0.75));
+
+            } else if (piece === "o") {
+                this.context.arc(widthOfOneSpot*(j+0.5),heightOfOneSpot*(i+0.5),widthOfOneSpot*0.25,0,2*Math.PI);
+            }
+            this.context.stroke();
+            j++;
+
+            if (j > this.numberOfSpotsInRow) {
+                j = 0;
+                i++;
+            }
+    
+
+            if (i > this.numberOfSpotsInCol) {
+                break;
+            }
+            arrayIndex = this.getArrayIndexFromRowAndCol(i,j);
+        }
+
+
+
+
     }
 
     checkValidSpot( r:number, c:number) : BoardPiece {
-        let pieceIdx = c + r*this.numberOfSpotsInRow;
+        console.log(r,c)
+        let pieceIdx = this.getArrayIndexFromRowAndCol(r,c);
         return {
-            isValid: !!this.boardArray[pieceIdx],
+            isValid: !this.boardArray[pieceIdx],
             index: pieceIdx
         };
+    }
+
+    getArrayIndexFromRowAndCol(r:number, c:number) : number {
+        return c + r*this.numberOfSpotsInRow;
     }
 
     clickBoard(x:number, y:number) : BoardPiece{
@@ -140,25 +190,30 @@ export class TicTacToeBoard extends Board{
         let heightOfOneSpot = this.canvas.height/this.numberOfSpotsInCol;
         
 
-        //check boundaries of board and see if the x-y of the click falls into a piece
+        //check if click is in cell boundaries
         while (i < this.numberOfSpotsInRow && j < this.numberOfSpotsInCol) {
-            let checkRow =  x > widthOfOneSpot*i && x < widthOfOneSpot*(i+1);
-            let checkCol = y > heightOfOneSpot*j && y < heightOfOneSpot*(j+1);
-
-            if (!checkRow) {
-                i++
-            }
-            
-            if (!checkCol) {
-                j++;
-            }
+            let checkCol = x > widthOfOneSpot*j && x < widthOfOneSpot*(j+1);
+            let checkRow = y > heightOfOneSpot*i && y < heightOfOneSpot*(i+1);
 
             if (checkRow && checkCol) {
                 break;
             }
-        }
 
-        return this.checkValidSpot(i,j);
+            j++;
+
+            if (j === this.numberOfSpotsInRow) {
+                j = 0;
+                i++;
+            }
+
+            if (i == this.numberOfSpotsInCol) {
+                break;
+            }
+
+
+        }
+        let valid = this.checkValidSpot(i,j);
+        return valid;
     }
 
 

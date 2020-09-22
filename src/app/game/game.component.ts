@@ -53,7 +53,7 @@ export class GameComponent implements OnInit, OnDestroy, AfterViewInit {
   @HostListener('window:resize', ['$event'])
   onResize(event){
     this.gameManager.board.setCanvasDimensions(window.innerWidth*0.7, window.innerHeight*0.8)
-    this.gameManager.board.drawBoard()
+    this.gameManager.board.drawBoardAndPieces();
   }
 
   onCanvasClick(event : MouseEvent) {
@@ -65,8 +65,9 @@ export class GameComponent implements OnInit, OnDestroy, AfterViewInit {
 
     if (boardPiece.isValid){
       this.gameManager.board.placePiece(boardPiece,this.playerPiece)
+      this.gameManager.board.drawBoardAndPieces();
     } else {
-      
+      console.log("not a valid postition")
     }
   }
 
