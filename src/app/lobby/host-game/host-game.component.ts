@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms'
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 
 //services
@@ -11,7 +12,7 @@ import { GameManagerService } from "../../shared/game-manager.service";
 })
 export class HostGameComponent implements OnInit {
 
-  constructor(private router: Router, private gameManager: GameManagerService) { }
+  constructor(@Inject(MAT_DIALOG_DATA) private hostName : string, private router: Router, private gameManager: GameManagerService) { }
 
   ngOnInit(): void {
   }
@@ -21,8 +22,9 @@ export class HostGameComponent implements OnInit {
     const gInfo : GameInfo = {
       gameName: form.value.gameName,
       gameType: form.value.gameType,
-      playerName: 'name',
-      host: true
+      hostName: this.hostName,
+      host: true,
+      opponentPC: false
     }
     this.gameManager.hostGame(gInfo);
 

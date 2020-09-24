@@ -26,7 +26,7 @@ export class LobbyComponent implements OnInit, OnDestroy {
 
   
   dataSource = new MatTableDataSource<GameInfo>();
-  displayedColumns = ["gameName" ,"playerName", "gameType"];
+  displayedColumns = ["gameName" ,"hostName", "gameType"];
   private dialogRef : MatDialogRef<HostGameComponent | JoinGameComponent | AgainstPcComponent | WaitingComponent>;
 
   constructor(
@@ -37,8 +37,8 @@ export class LobbyComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.dataSource.data = [
-      {playerName: "funkMaster100", gameType: "TicTacToe", gameName: "You cant beat"},
-      {playerName: "connect4Mstr", gameType: "Connect4", gameName: "Casual"}
+      {hostName: "funkMaster100", gameType: "TicTacToe", gameName: "You cant beat", opponentPC: false},
+      {hostName: "connect4Mstr", gameType: "Connect4", gameName: "Casual", opponentPC: false}
     ];//dummy data
 
     this.gameInfoSubscription = this.gameManager.gameInfoSubject.subscribe(gameInfo => {
@@ -48,16 +48,20 @@ export class LobbyComponent implements OnInit, OnDestroy {
         this.dialogRef = null;
       }
 
-      //navigate
+      if (gameInfo.opponentPC){
+        this.router.navigate(['/game']);
+      }
+
+      
       if (gameInfo.host) {
-        this.dialogRef = this.dialog.open(WaitingComponent, {data : {message: "Waiting for opponent."}})
+        this.dialogRef = this.dialog.open(WaitingComponent, {data :  "Waiting for opponent."})
 
         setTimeout(() => {
           this.dialogRef.close()
           this.dialogRef = null;
           this.router.navigate(['/game'])
         }, 4000);
-      }
+      } 
 
 
     })
@@ -68,7 +72,8 @@ export class LobbyComponent implements OnInit, OnDestroy {
   }
 
   onHostGame() {
-    this.dialogRef = this.dialog.open(HostGameComponent);
+    const hostName = this.gameManager.playerName;
+    this.dialogRef = this.dialog.open(HostGameComponent, {data : hostName});
   }
 
   onAgainstPC() {
@@ -77,5 +82,9 @@ export class LobbyComponent implements OnInit, OnDestroy {
 
   onClickRow(row : GameInfo) {
     this.dialogRef = this.dialog.open(JoinGameComponent, {data: row});
+  }
+
+  getUserName() {
+    return this.gameManager.playerName;
   }
 }

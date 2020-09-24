@@ -9,6 +9,8 @@ export class GameManagerService {
   gameInfoSubject = new Subject<GameInfo>();
   board : TicTacToeBoard | ConnectFourBoard = null;
   private gameInfo : GameInfo;
+  playerName : string ;
+  turn : string;
 
   constructor() { }
 
@@ -29,6 +31,9 @@ export class GameManagerService {
   }
 
   startGame(canvas : HTMLCanvasElement) {
+
+    this.turn = Math.floor(Math.random()*2)  === 1 ? "x" : "o";
+
     //set the board
     if (this.gameInfo.gameType === "TTT") {
       this.board = new TicTacToeBoard(canvas);

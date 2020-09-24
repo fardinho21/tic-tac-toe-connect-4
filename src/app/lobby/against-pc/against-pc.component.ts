@@ -19,7 +19,8 @@ export class AgainstPcComponent implements OnInit {
     const gInfo : GameInfo = {
       gameName: "name",
       gameType: form.value.gameType,
-      playerName: 'name'
+      hostName: this.gameManager.playerName,
+      opponentPC: true
     }
 
     this.gameManager.againstPC(gInfo)

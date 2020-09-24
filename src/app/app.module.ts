@@ -22,14 +22,16 @@ import { GameComponent } from "./game/game.component";
 
 declare global {
   export interface GameInfo {
-    playerName: string;
+    hostName: string;
     gameType: string;
     gameName: string;
+    opponentPC: boolean;
+    opponentName?: string;
     host?: boolean;
   }
   export interface BoardPiece {
     isValid: boolean;
-    index: number;
+    index: number[];
   }
 }
 

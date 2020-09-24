@@ -1,7 +1,13 @@
+
 <main>
 
+    <div id="banner">
+        <h6>Host : {{hostName}}</h6>
+        <h6>Opponent : {{opponentName}} </h6>
+    </div>
+
     <section id="canvasContainer">
-        <canvas #canvas style="border: 5px solid red;" (click)="onCanvasClick($event)">
+        <canvas #canvas style="border: 5px inset indigo;" (click)="onCanvasClick($event)">
 
         </canvas>
     </section>

@@ -22,15 +22,30 @@ export class GameComponent implements OnInit, OnDestroy, AfterViewInit {
   private context : CanvasRenderingContext2D;
   private dialogRef: MatDialogRef<QuitGameComponent | NotValidComponent>;
   private playerPiece : string = "o";
+  hostName : string = "host";
+  opponentName : string = "opponent";
+  turnBool : boolean = false;
 
-  constructor(private gameManager: GameManagerService, private dialog: MatDialog, private router: Router) { }
+
+  constructor(private gameManager: GameManagerService, private dialog: MatDialog, private router: Router) { 
+    const gInfo = gameManager.getGameInfo();
+    this.hostName = gInfo.hostName;
+    this.opponentName = gInfo.opponentPC ? "Computer" : gInfo.opponentName;
+
+    if (gInfo.opponentPC) {
+      this.playerPiece = Math.floor(Math.random()*2)  === 1 ? "x" : "o";
+    }
+  }
 
   ngOnInit(): void {
-
-
     this.gameInfoSubscription = this.gameManager.gameInfoSubject.subscribe(gameInfo => {
+      // this.hostName = gameInfo.hostName
+      // this.opponentName = gameInfo.opponentName;
+
+      if (!gameInfo) {
+        this.router.navigate(['/lobby'])
+      } 
       this.dialogRef.close();
-      this.router.navigate(['/lobby'])
     })
   }
 
@@ -44,6 +59,10 @@ export class GameComponent implements OnInit, OnDestroy, AfterViewInit {
     this.canvas.width = window.innerWidth*0.7;
     this.canvas.height = window.innerHeight*0.8;
     this.gameManager.startGame(this.canvas);
+    
+    if (this.gameManager.turn === this.playerPiece) {
+      this.turnBool = true;
+    }
 
     this.canvasSubscription = this.gameManager.board.canvasSubject.subscribe((canvas : HTMLCanvasElement) => {
       this.canvas = canvas
@@ -57,6 +76,11 @@ export class GameComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   onCanvasClick(event : MouseEvent) {
+
+    if (!this.turnBool) {
+      return
+    }
+
     let rect = this.canvas.getBoundingClientRect()
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;

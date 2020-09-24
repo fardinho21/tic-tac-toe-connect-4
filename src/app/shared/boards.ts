@@ -2,22 +2,26 @@ import { Subject } from "rxjs";
 
 export abstract class Board {
 
-    constructor(canvas : HTMLCanvasElement, numSpotsInRow: number, numSpotsInCol: number) {
+    constructor(canvas : HTMLCanvasElement, numberOfRows: number, numberOfCols: number) {
         this.canvas = canvas;
         this.context = canvas.getContext('2d');
-        this.numberOfSpotsInRow = numSpotsInRow;
-        this.numberOfSpotsInCol = numSpotsInCol
-        this.boardArray = new Array(numSpotsInRow*this.numberOfSpotsInCol);
+        this.lengthOfCol = numberOfRows;
+        this.lengthOfRow = numberOfCols;
+        this.boardArray = new Array(numberOfRows);
+        for (let i = 0; i < numberOfRows; i++){
+            this.boardArray[i] = new Array<string>(this.lengthOfRow)
+            this.boardArray[i].fill("")
+        }
         this.setCanvasDimensions(this.canvas.width,this.canvas.height);
     }
 
-    public boardArray = [] //stroes the pieces
+    public boardArray : Array<string[]> //stroes the pieces
 
     public canvas : HTMLCanvasElement;
     public context : CanvasRenderingContext2D;
     public canvasSubject = new Subject<HTMLCanvasElement>();
-    public numberOfSpotsInRow : number; //number of spots in a row or column
-    public numberOfSpotsInCol : number;
+    public lengthOfCol : number; //number of spots in a row or column
+    public lengthOfRow : number;
 
     abstract async checkForWinner();
     abstract clickBoard(x:number,y:number):BoardPiece;
@@ -26,7 +30,7 @@ export abstract class Board {
     abstract drawPieces();
 
     placePiece(boardPiece: BoardPiece, playerPiece:string) {
-        this.boardArray[boardPiece.index]=playerPiece;
+        this.boardArray[boardPiece.index[0]][boardPiece.index[1]] =playerPiece;
     }
     
     drawBoardAndPieces() {
@@ -61,7 +65,7 @@ export class TicTacToeBoard extends Board{
     
     constructor(canvas : HTMLCanvasElement) {
         super(canvas, 3, 3);
-        this.boardArray[0]="x";
+        this.boardArray[0][0]="x";
         this.drawBoardAndPieces();
         console.log(this.boardArray);
     }
@@ -99,23 +103,23 @@ export class TicTacToeBoard extends Board{
 
         console.log(this.canvas.width, this.canvas.height)
         //draw columns
-        let i = this.canvas.width/this.numberOfSpotsInCol
+        let i = this.canvas.width/this.lengthOfRow
         while (i < this.canvas.width) {
             this.context.beginPath() 
             this.context.moveTo(i,0);
             this.context.lineTo(i,this.canvas.height);
-            i+=this.canvas.width/this.numberOfSpotsInCol;
+            i+=this.canvas.width/this.lengthOfRow;
             this.context.stroke()
         }
 
-        i = this.canvas.height/this.numberOfSpotsInRow
+        i = this.canvas.height/this.lengthOfCol
 
         //draw rows
         while (i < this.canvas.height) {
             this.context.beginPath() 
             this.context.moveTo(0,i);
             this.context.lineTo(this.canvas.width,i);
-            i+=this.canvas.height/this.numberOfSpotsInRow;
+            i+=this.canvas.height/this.lengthOfCol;
             this.context.stroke()
         }       
 
@@ -126,13 +130,12 @@ export class TicTacToeBoard extends Board{
 
         let i = 0;
         let j = 0;
-        let widthOfOneSpot = this.canvas.width/this.numberOfSpotsInRow;
-        let heightOfOneSpot = this.canvas.height/this.numberOfSpotsInCol;
-        let arrayIndex = this.getArrayIndexFromRowAndCol(i,j);
+        let widthOfOneSpot = this.canvas.width/this.lengthOfCol;
+        let heightOfOneSpot = this.canvas.height/this.lengthOfRow;
         this.context.lineWidth = 5;
-        while (arrayIndex < this.boardArray.length ) {
+        while (true ) {
             
-            let piece = this.boardArray[arrayIndex];
+            let piece = this.boardArray[i][j];
             this.context.beginPath()
             if (piece === "x") {
 
@@ -155,47 +158,44 @@ export class TicTacToeBoard extends Board{
             this.context.stroke();
             j++;
 
-            if (j > this.numberOfSpotsInRow) {
+            if (j > this.lengthOfCol) {
                 j = 0;
                 i++;
             }
     
 
-            if (i > this.numberOfSpotsInCol) {
+            if (i > this.lengthOfRow - 1) {
                 break;
             }
-            arrayIndex = this.getArrayIndexFromRowAndCol(i,j);
+            
         }
         this.context.lineWidth = 1;
 
-
+        
 
     }
 
     checkValidSpot( r:number, c:number) : BoardPiece {
         console.log(r,c)
-        let pieceIdx = this.getArrayIndexFromRowAndCol(r,c);
         return {
-            isValid: !this.boardArray[pieceIdx],
-            index: pieceIdx
+            isValid: !this.boardArray[r][c],
+            index: [r,c]
         };
     }
 
-    getArrayIndexFromRowAndCol(r:number, c:number) : number {
-        return c + r*this.numberOfSpotsInRow;
-    }
+
 
     clickBoard(x:number, y:number) : BoardPiece{
 
         
         let i = 0;
         let j = 0;
-        let widthOfOneSpot = this.canvas.width/this.numberOfSpotsInRow;
-        let heightOfOneSpot = this.canvas.height/this.numberOfSpotsInCol;
+        let widthOfOneSpot = this.canvas.width/this.lengthOfCol;
+        let heightOfOneSpot = this.canvas.height/this.lengthOfRow;
         
 
         //check if click is in cell boundaries
-        while (i < this.numberOfSpotsInRow && j < this.numberOfSpotsInCol) {
+        while (i < this.lengthOfCol && j < this.lengthOfRow) {
             let checkCol = x > widthOfOneSpot*j && x < widthOfOneSpot*(j+1);
             let checkRow = y > heightOfOneSpot*i && y < heightOfOneSpot*(i+1);
 
@@ -205,12 +205,12 @@ export class TicTacToeBoard extends Board{
 
             j++;
 
-            if (j === this.numberOfSpotsInRow) {
+            if (j === this.lengthOfCol) {
                 j = 0;
                 i++;
             }
 
-            if (i == this.numberOfSpotsInCol) {
+            if (i == this.lengthOfRow) {
                 break;
             }
 
@@ -234,7 +234,7 @@ export class ConnectFourBoard extends Board{
     }
     
     checkValidSpot(r:number,c:number){
-        return {isValid:false,index:0}
+        return {isValid:false,index:[]}
     }
 
     drawBoard() {
@@ -246,6 +246,6 @@ export class ConnectFourBoard extends Board{
     }
     
     clickBoard(x:number,y:number) {
-        return {isValid:false,index:0}
+        return {isValid:false,index:[]}
     }
 }
