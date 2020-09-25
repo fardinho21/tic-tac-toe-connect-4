@@ -5,7 +5,7 @@ import { Subscription } from 'rxjs';
 import { GameManagerService } from '../shared/game-manager.service';
 import { QuitGameComponent } from './quit-game/quit-game.component';
 import { NotValidComponent } from './not-valid/not-valid.component';
-
+import { ConfirmMoveComponent } from "./confirm-move/confirm-move.component";
 @Component({
   selector: 'app-game',
   templateUrl: './game.component.html',
@@ -15,16 +15,18 @@ export class GameComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private gameInfoSubscription : Subscription; 
   private canvasSubscription : Subscription;
+  private turnSubsription : Subscription;
 
   @ViewChild('canvas', {static: false})
   private canvasElRef: ElementRef<HTMLCanvasElement>;
   private canvas : HTMLCanvasElement;
   private context : CanvasRenderingContext2D;
-  private dialogRef: MatDialogRef<QuitGameComponent | NotValidComponent>;
+  private dialogRef: MatDialogRef<QuitGameComponent | NotValidComponent | ConfirmMoveComponent>;
   private playerPiece : string = "o";
   hostName : string = "host";
   opponentName : string = "opponent";
   turnBool : boolean = false;
+  clickedSpot : number[];
 
 
   constructor(private gameManager: GameManagerService, private dialog: MatDialog, private router: Router) { 
@@ -33,7 +35,7 @@ export class GameComponent implements OnInit, OnDestroy, AfterViewInit {
     this.opponentName = gInfo.opponentPC ? "Computer" : gInfo.opponentName;
 
     if (gInfo.opponentPC) {
-      this.playerPiece = Math.floor(Math.random()*2)  === 1 ? "x" : "o";
+      //this.playerPiece = Math.floor(Math.random()*2)  === 1 ? "x" : "o";
     }
   }
 
@@ -47,11 +49,23 @@ export class GameComponent implements OnInit, OnDestroy, AfterViewInit {
       } 
       this.dialogRef.close();
     })
+
+    this.turnSubsription = this.gameManager.playerTurnSubject.subscribe(turn => {
+      this.clickedSpot = null;
+      
+      if (this.dialogRef) {
+        this.dialogRef.close();
+        this.dialogRef = null;
+      }
+
+      this.turnBool = turn == this.playerPiece ? true : false;
+    })
   }
 
   ngOnDestroy() {
     this.gameInfoSubscription.unsubscribe();
     this.canvasSubscription.unsubscribe();
+    this.turnSubsription.unsubscribe();
   }
 
   ngAfterViewInit() {
@@ -77,7 +91,7 @@ export class GameComponent implements OnInit, OnDestroy, AfterViewInit {
 
   onCanvasClick(event : MouseEvent) {
 
-    if (!this.turnBool) {
+    if (!this.turnBool ) {
       return
     }
 
@@ -87,16 +101,30 @@ export class GameComponent implements OnInit, OnDestroy, AfterViewInit {
     //console.log(event.clientX - rect.left, event.clientY - rect.top);
     let boardPiece : BoardPiece = this.gameManager.board.clickBoard(x,y)
 
-    if (boardPiece.isValid){
+    if (this.clickedSpot) {
+      if (this.clickedSpot[0] != boardPiece.index[0] || this.clickedSpot[1] != boardPiece.index[1]) {
+        return
+      }
+    }
+
+    this.clickedSpot = boardPiece.index
+    
+
+    if (!boardPiece.piece){
       this.gameManager.board.placePiece(boardPiece,this.playerPiece)
       this.gameManager.board.drawBoardAndPieces();
+    } else if (boardPiece.piece === this.playerPiece && !boardPiece.set) {
+      this.clickedSpot = null;
+      this.gameManager.board.removePiece(boardPiece);
+      this.gameManager.board.drawBoardAndPieces();
     } else {
+      this.clickedSpot = null;
       this.dialogRef = this.dialog.open(NotValidComponent);
     }
   }
 
   onConfirmMove() {
-
+    this.dialogRef = this.dialog.open(ConfirmMoveComponent)
   }
 
   onQuitGame() {

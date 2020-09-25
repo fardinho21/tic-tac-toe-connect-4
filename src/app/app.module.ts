@@ -17,6 +17,7 @@ import { NotValidComponent } from "./game/not-valid/not-valid.component";
 import { AgainstPcComponent } from "./lobby/against-pc/against-pc.component";
 import { WaitingComponent } from "./lobby/waiting/waiting.component"
 import { LoadingComponent } from "./shared/loading/loading.component";
+import { ConfirmMoveComponent } from "./game/confirm-move/confirm-move.component";
 import { GameComponent } from "./game/game.component";
 
 
@@ -28,10 +29,12 @@ declare global {
     opponentPC: boolean;
     opponentName?: string;
     host?: boolean;
+    difficulty? : string;
   }
   export interface BoardPiece {
-    isValid: boolean;
     index: number[];
+    set : boolean;
+    piece: string;
   }
 }
 
@@ -44,6 +47,7 @@ declare global {
     HostGameComponent,
     JoinGameComponent, 
     QuitGameComponent,
+    ConfirmMoveComponent,
     AgainstPcComponent,
     LoadingComponent,
     WaitingComponent,
@@ -65,7 +69,8 @@ declare global {
     QuitGameComponent, 
     AgainstPcComponent,
     WaitingComponent,
-    NotValidComponent
+    NotValidComponent,
+    ConfirmMoveComponent
   ]
 })
 export class AppModule { }

@@ -8,14 +8,17 @@ export abstract class Board {
         this.lengthOfCol = numberOfRows;
         this.lengthOfRow = numberOfCols;
         this.boardArray = new Array(numberOfRows);
+
         for (let i = 0; i < numberOfRows; i++){
-            this.boardArray[i] = new Array<string>(this.lengthOfRow)
-            this.boardArray[i].fill("")
+            this.boardArray[i] = new Array<BoardPiece>(this.lengthOfRow)
+            for (let j = 0; j < numberOfCols; j++) {
+                this.boardArray[i][j] = {piece: "", index: [i,j], set: false}
+            }
         }
         this.setCanvasDimensions(this.canvas.width,this.canvas.height);
     }
 
-    public boardArray : Array<string[]> //stroes the pieces
+    public boardArray : Array<BoardPiece[]> //stroes the pieces
 
     public canvas : HTMLCanvasElement;
     public context : CanvasRenderingContext2D;
@@ -25,15 +28,25 @@ export abstract class Board {
 
     abstract async checkForWinner();
     abstract clickBoard(x:number,y:number):BoardPiece;
-    abstract checkValidSpot(r:number,c:number):BoardPiece;
+    abstract getBoardPiece(r:number,c:number):BoardPiece;
     abstract drawBoard();
     abstract drawPieces();
 
+    clearBoard() {
+        this.context.clearRect(0,0,this.canvas.width, this.canvas.height);
+    }
+
     placePiece(boardPiece: BoardPiece, playerPiece:string) {
-        this.boardArray[boardPiece.index[0]][boardPiece.index[1]] =playerPiece;
+        let bp  = this.boardArray[boardPiece.index[0]][boardPiece.index[1]];
+        bp.piece = playerPiece;
+    }
+
+    removePiece(boardPiece : BoardPiece) {
+        this.boardArray[boardPiece.index[0]][boardPiece.index[1]] = {set : false, piece : "", index : boardPiece.index}
     }
     
     drawBoardAndPieces() {
+        this.clearBoard();
         this.drawBoard();
         this.drawPieces();
         this.canvasSubject.next(this.canvas);
@@ -65,7 +78,7 @@ export class TicTacToeBoard extends Board{
     
     constructor(canvas : HTMLCanvasElement) {
         super(canvas, 3, 3);
-        this.boardArray[0][0]="x";
+        this.boardArray[0][0]= {index: [0,0], piece: "x", set: true};
         this.drawBoardAndPieces();
         console.log(this.boardArray);
     }
@@ -133,11 +146,11 @@ export class TicTacToeBoard extends Board{
         let widthOfOneSpot = this.canvas.width/this.lengthOfCol;
         let heightOfOneSpot = this.canvas.height/this.lengthOfRow;
         this.context.lineWidth = 5;
-        while (true ) {
+        while (true) {
             
             let piece = this.boardArray[i][j];
             this.context.beginPath()
-            if (piece === "x") {
+            if (piece.piece === "x") {
 
                 this.context.moveTo(widthOfOneSpot*(j+0.5),heightOfOneSpot*(i+0.5));
                 this.context.lineTo(widthOfOneSpot*(j+0.25),heightOfOneSpot*(i+0.25));
@@ -148,7 +161,7 @@ export class TicTacToeBoard extends Board{
                 this.context.moveTo(widthOfOneSpot*(j+0.5),heightOfOneSpot*(i+0.5));
                 this.context.lineTo(widthOfOneSpot*(j+0.75),heightOfOneSpot*(i+0.75));
 
-            } else if (piece === "o") {
+            } else if (piece.piece === "o") {
                 this.context.ellipse(
                     widthOfOneSpot*(j+0.5),
                     heightOfOneSpot*(i+0.5),
@@ -158,7 +171,7 @@ export class TicTacToeBoard extends Board{
             this.context.stroke();
             j++;
 
-            if (j > this.lengthOfCol) {
+            if (j > this.lengthOfCol - 1) {
                 j = 0;
                 i++;
             }
@@ -175,12 +188,9 @@ export class TicTacToeBoard extends Board{
 
     }
 
-    checkValidSpot( r:number, c:number) : BoardPiece {
+    getBoardPiece( r:number, c:number) : BoardPiece {
         console.log(r,c)
-        return {
-            isValid: !this.boardArray[r][c],
-            index: [r,c]
-        };
+        return this.boardArray[r][c]
     }
 
 
@@ -216,8 +226,8 @@ export class TicTacToeBoard extends Board{
 
 
         }
-        let valid = this.checkValidSpot(i,j);
-        return valid;
+        let piece = this.getBoardPiece(i,j);
+        return piece;
     }
 
 
@@ -233,8 +243,8 @@ export class ConnectFourBoard extends Board{
 
     }
     
-    checkValidSpot(r:number,c:number){
-        return {isValid:false,index:[]}
+    getBoardPiece(r:number,c:number){
+        return {index: [], set: false, piece: ""}
     }
 
     drawBoard() {
@@ -246,6 +256,6 @@ export class ConnectFourBoard extends Board{
     }
     
     clickBoard(x:number,y:number) {
-        return {isValid:false,index:[]}
+        return {index: [], set: false, piece: ""}
     }
 }

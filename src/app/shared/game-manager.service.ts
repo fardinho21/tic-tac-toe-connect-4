@@ -7,6 +7,7 @@ import { TicTacToeBoard, ConnectFourBoard } from "./boards";
 export class GameManagerService {
 
   gameInfoSubject = new Subject<GameInfo>();
+  playerTurnSubject = new Subject<string>();
   board : TicTacToeBoard | ConnectFourBoard = null;
   private gameInfo : GameInfo;
   playerName : string ;
@@ -32,7 +33,9 @@ export class GameManagerService {
 
   startGame(canvas : HTMLCanvasElement) {
 
-    this.turn = Math.floor(Math.random()*2)  === 1 ? "x" : "o";
+    //this.turn = Math.floor(Math.random()*2)  === 1 ? "x" : "o";
+    this.turn = "o";
+    this.playerTurnSubject.next(this.turn);
 
     //set the board
     if (this.gameInfo.gameType === "TTT") {
@@ -41,6 +44,11 @@ export class GameManagerService {
       this.board = new ConnectFourBoard(canvas);
     }
 
+  }
+
+  nextTurn() {
+    this.turn = this.turn === "x" ? "o" : "x";
+    this.playerTurnSubject.next(this.turn);
   }
 
   setGameInfo(gameInfo : GameInfo) {

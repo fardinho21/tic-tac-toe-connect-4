@@ -20,7 +20,8 @@ export class AgainstPcComponent implements OnInit {
       gameName: "name",
       gameType: form.value.gameType,
       hostName: this.gameManager.playerName,
-      opponentPC: true
+      opponentPC: true,
+      difficulty: form.value.gameDiff
     }
 
     this.gameManager.againstPC(gInfo)

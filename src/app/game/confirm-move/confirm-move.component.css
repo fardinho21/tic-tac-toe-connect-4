@@ -1,14 +1,13 @@
-form {
+main {
     display: flex;
     flex-direction: column;
-    justify-content: center;
 }
 
-section {
+#buttons {
     display: flex;
     justify-content: center;
 }
 
 button {
-    margin: auto;
+    margin: auto
 }

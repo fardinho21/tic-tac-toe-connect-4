@@ -27,3 +27,7 @@ button {
 #banner h6 {
     margin: auto;
 }
+
+.turn {
+    border: 3px solid blue;
+}

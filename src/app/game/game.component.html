@@ -2,8 +2,8 @@
 <main>
 
     <div id="banner">
-        <h6>Host : {{hostName}}</h6>
-        <h6>Opponent : {{opponentName}} </h6>
+        <h6 [ngClass]="{turn : turnBool === true}">Host : {{hostName}}</h6>
+        <h6 [ngClass]="{turn : turnBool === false }">Opponent : {{opponentName}} </h6>
     </div>
 
     <section id="canvasContainer">
@@ -15,7 +15,7 @@
 
     <section id="buttons">
         <button mat-flat-button color="accent" type="button" (click)="onQuitGame()">Quit Game</button>
-        <button mat-flat-button color="primary" type="button">Confirm Move</button>
+        <button mat-flat-button color="primary" type="button" [disabled]='!turnBool || !clickedSpot' (click)="onConfirmMove()">Confirm Move</button>
     </section>
 
 </main>
