@@ -1,10 +1,13 @@
 import { TicTacToeBoard } from "./boards";
+import { GameManagerService } from "./game-manager.service";
+import { Subscription } from "rxjs";
 
 abstract class Player {
 
     boardArray = [];
+    playerTurnSubscription : Subscription
 
-    constructor(protected piece : string, protected isHuman : boolean, protected mode : string = "easy") {
+    constructor(protected piece : string, protected isHuman : boolean, protected mode : string = "easy", protected gameManager : GameManagerService=null) {
         this.mode = mode;
     }
     
@@ -25,8 +28,13 @@ abstract class Player {
 
 export class ComputerPlayer extends Player {
 
-    constructor(piece : string, isHuman=false, mode : string = "easy"){
+    constructor(piece : string, isHuman=false, mode : string = "easy", gm: GameManagerService =null){
         super(piece,isHuman,mode)
+        this.playerTurnSubscription = gm.playerTurnSubject.subscribe(turn => {
+            if (turn == this.piece) {
+                this.play();
+            }
+        })
     }
 
     play () {
