@@ -16,13 +16,14 @@ export class GameComponent implements OnInit, OnDestroy, AfterViewInit {
   private gameInfoSubscription : Subscription; 
   private canvasSubscription : Subscription;
   private turnSubsription : Subscription;
+  private assignedPieceSubscription : Subscription;
 
   @ViewChild('canvas', {static: false})
   private canvasElRef: ElementRef<HTMLCanvasElement>;
   private canvas : HTMLCanvasElement;
   private context : CanvasRenderingContext2D;
   private dialogRef: MatDialogRef<QuitGameComponent | NotValidComponent | ConfirmMoveComponent>;
-  private playerPiece : string = "o";
+  private playerPiece : string;
   hostName : string = "host";
   opponentName : string = "opponent";
   turnBool : boolean = false;
@@ -33,13 +34,10 @@ export class GameComponent implements OnInit, OnDestroy, AfterViewInit {
     const gInfo = gameManager.getGameInfo();
     this.hostName = gInfo.hostName;
     this.opponentName = gInfo.opponentPC ? "Computer" : gInfo.opponentName;
-
-    if (gInfo.opponentPC) {
-      //this.playerPiece = Math.floor(Math.random()*2)  === 1 ? "x" : "o";
-    }
   }
 
   ngOnInit(): void {
+    //subscriptions
     this.gameInfoSubscription = this.gameManager.gameInfoSubject.subscribe(gameInfo => {
       // this.hostName = gameInfo.hostName
       // this.opponentName = gameInfo.opponentName;
@@ -51,6 +49,7 @@ export class GameComponent implements OnInit, OnDestroy, AfterViewInit {
     })
 
     this.turnSubsription = this.gameManager.playerTurnSubject.subscribe(turn => {
+      
       this.clickedSpot = null;
       
       if (this.dialogRef) {
@@ -58,7 +57,11 @@ export class GameComponent implements OnInit, OnDestroy, AfterViewInit {
         this.dialogRef = null;
       }
 
-      this.turnBool = turn == this.playerPiece ? true : false;
+      this.turnBool = turn ===  this.playerPiece ? true : false;
+    })
+  
+    this.assignedPieceSubscription = this.gameManager.assignPieceSubject.subscribe(piece => {
+      this.playerPiece = piece;
     })
   }
 
@@ -66,18 +69,18 @@ export class GameComponent implements OnInit, OnDestroy, AfterViewInit {
     this.gameInfoSubscription.unsubscribe();
     this.canvasSubscription.unsubscribe();
     this.turnSubsription.unsubscribe();
+    this.assignedPieceSubscription.unsubscribe();
   }
 
   ngAfterViewInit() {
+
     this.canvas = this.canvasElRef.nativeElement;
     this.canvas.width = window.innerWidth*0.7;
     this.canvas.height = window.innerHeight*0.8;
-    this.gameManager.startGame(this.canvas);
-    
-    if (this.gameManager.turn === this.playerPiece) {
-      this.turnBool = true;
-    }
 
+    this.gameManager.startGame(this.canvas);
+
+    //subscriptions
     this.canvasSubscription = this.gameManager.board.canvasSubject.subscribe((canvas : HTMLCanvasElement) => {
       this.canvas = canvas
     })
@@ -91,40 +94,38 @@ export class GameComponent implements OnInit, OnDestroy, AfterViewInit {
 
   onCanvasClick(event : MouseEvent) {
 
-    if (!this.turnBool ) {
+    //do nothing if it is not the player's turn
+    if (!this.turnBool) {
       return
     }
 
     let rect = this.canvas.getBoundingClientRect()
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
-    //console.log(event.clientX - rect.left, event.clientY - rect.top);
+    
+    //get the board piece where user clicked
     let boardPiece : BoardPiece = this.gameManager.board.clickBoard(x,y)
 
-    if (this.clickedSpot) {
-      if (this.clickedSpot[0] != boardPiece.index[0] || this.clickedSpot[1] != boardPiece.index[1]) {
-        return
-      }
+    if (boardPiece.piece != "" && boardPiece.piece != this.playerPiece || boardPiece.set) {
+      this.dialog.open(NotValidComponent);
+      return
     }
 
-    this.clickedSpot = boardPiece.index
+
+    if (this.clickedSpot === boardPiece.index && boardPiece.piece === this.playerPiece) {
+      this.gameManager.removePiece(this.clickedSpot)
+      this.clickedSpot = null;
+    } else if (!this.clickedSpot){
+      this.clickedSpot = boardPiece.index
+      this.gameManager.notFinalMove(this.clickedSpot, this.playerPiece);
+    }
+
     
-
-    if (!boardPiece.piece){
-      this.gameManager.board.placePiece(boardPiece,this.playerPiece)
-      this.gameManager.board.drawBoardAndPieces();
-    } else if (boardPiece.piece === this.playerPiece && !boardPiece.set) {
-      this.clickedSpot = null;
-      this.gameManager.board.removePiece(boardPiece);
-      this.gameManager.board.drawBoardAndPieces();
-    } else {
-      this.clickedSpot = null;
-      this.dialogRef = this.dialog.open(NotValidComponent);
-    }
   }
 
   onConfirmMove() {
-    this.dialogRef = this.dialog.open(ConfirmMoveComponent)
+    this.dialogRef = this.dialog.open(ConfirmMoveComponent, {data: [this.clickedSpot,this.playerPiece]})
+    this.clickedSpot = null;
   }
 
   onQuitGame() {

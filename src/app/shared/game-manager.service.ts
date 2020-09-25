@@ -1,20 +1,26 @@
 import { Injectable } from '@angular/core';
 import { Subject } from "rxjs";
-import { TicTacToeBoard, ConnectFourBoard } from "./boards";
-import { ComputerPlayer } from "../shared/player";
+import { TicTacToeBoard } from "./board/ttt-board";
+import { ConnectFourBoard} from "./board/cf-board";
+import { ComputerPlayer } from "./player/player";
 
 @Injectable({
   providedIn: 'root'
 })
 export class GameManagerService {
+  private gameInfo : GameInfo;
+  private assignedPiece : string ;
 
   gameInfoSubject = new Subject<GameInfo>();
   playerTurnSubject = new Subject<string>();
+  assignPieceSubject = new Subject<string>();
+
   board : TicTacToeBoard | ConnectFourBoard = null;
-  private gameInfo : GameInfo;
+  pc : ComputerPlayer;
+
   playerName : string ;
   turn : string;
-  pc : ComputerPlayer;
+  
 
   constructor() { }
 
@@ -31,32 +37,53 @@ export class GameManagerService {
   }
 
   quitGame() {
+    
     this.clearGameInfo();
+    this.board.clearBoard();
+    delete this.board;
+    delete this.pc;
+    this.turn = "";
   }
 
   startGame(canvas : HTMLCanvasElement) {
 
+    const ginfo = this.gameInfo;
+
+    this.assignedPiece = Math.floor(Math.random()*1) === 0 ? "o" : "x";
     
+    if (ginfo.opponentPC) {
+      
+      this.pc = new ComputerPlayer(this.assignedPiece,false,"easy",this);
+      this.assignPieceSubject.next(this.assignedPiece === "x" ? "o" : "x");
+    }
 
-
-    //set the board
-    if (this.gameInfo.gameType === "TTT") {
-      this.turn = Math.floor(Math.random()*2)  === 1 ? "x" : "o";
-      this.playerTurnSubject.next(this.turn);
+    if (ginfo.gameType === "TTT") {
       this.board = new TicTacToeBoard(canvas);
-      if (this.gameInfo.opponentPC) {
-        const pcPiece = this.turn === "o" ? "x" : "o";
-        this.pc = new ComputerPlayer(pcPiece,false,this.gameInfo.difficulty,this);
-      }
-    } else if (this.gameInfo.gameType === "CF") {
+    } else if (ginfo.gameType === "CF") {
       this.board = new ConnectFourBoard(canvas);
     }
 
+    this.playerTurnSubject.next(Math.floor(Math.random()*1) === 0 ? "o" : "x");
+  }
+
+  confirmMove(move : number[], piece: string) {
+    this.board.placePiece(move,piece,true)
+    this.board.drawBoardAndPieces();
+    this.nextTurn();
+  }
+
+  notFinalMove(move : number[], piece: string) {
+    this.board.placePiece(move,piece,false)
+    this.board.drawBoardAndPieces();
+  }
+
+  removePiece(move: number[]) {
+    this.board.removePiece(move);
+    this.board.drawBoardAndPieces();
   }
 
   nextTurn() {
-    this.turn = this.turn === "x" ? "o" : "x";
-    this.playerTurnSubject.next(this.turn);
+    this.playerTurnSubject.next(this.turn === "x" ? "o" : "x");
   }
 
   setGameInfo(gameInfo : GameInfo) {

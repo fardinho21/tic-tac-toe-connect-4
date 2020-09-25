@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
+import { MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { GameManagerService } from "../../shared/game-manager.service";
 
 @Component({
@@ -8,13 +9,13 @@ import { GameManagerService } from "../../shared/game-manager.service";
 })
 export class ConfirmMoveComponent implements OnInit {
 
-  constructor(private gameManager : GameManagerService) { }
+  constructor(@Inject(MAT_DIALOG_DATA) public move : any[], private gameManager : GameManagerService) { }
 
   ngOnInit(): void {
   }
 
   yes() {
-    this.gameManager.nextTurn();
+    this.gameManager.confirmMove(this.move[0],this.move[1]);
   }
 
 }
