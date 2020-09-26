@@ -9,11 +9,11 @@ import { ComputerPlayer } from "./player/player";
 })
 export class GameManagerService {
   private gameInfo : GameInfo;
-  private assignedPiece : string ;
+  private computerPiece : string ;
 
   gameInfoSubject = new Subject<GameInfo>();
   playerTurnSubject = new Subject<string>();
-  assignPieceSubject = new Subject<string>();
+  computerPieceSubject = new Subject<string>();
 
   board : TicTacToeBoard | ConnectFourBoard = null;
   pc : ComputerPlayer;
@@ -40,6 +40,7 @@ export class GameManagerService {
     
     this.clearGameInfo();
     this.board.clearBoard();
+    this.board.emptyBoard();
     delete this.board;
     delete this.pc;
     this.turn = "";
@@ -49,12 +50,11 @@ export class GameManagerService {
 
     const ginfo = this.gameInfo;
 
-    this.assignedPiece = Math.floor(Math.random()*1) === 0 ? "o" : "x";
+    this.computerPiece = Math.floor(Math.random()*1) === 0 ? "o" : "x";
     
     if (ginfo.opponentPC) {
-      
-      this.pc = new ComputerPlayer(this.assignedPiece,false,"easy",this);
-      this.assignPieceSubject.next(this.assignedPiece === "x" ? "o" : "x");
+      this.pc = new ComputerPlayer(this.computerPiece,false,"easy",this);
+      this.computerPieceSubject.next(this.computerPiece === "x" ? "o" : "x");
     }
 
     if (ginfo.gameType === "TTT") {
@@ -62,12 +62,12 @@ export class GameManagerService {
     } else if (ginfo.gameType === "CF") {
       this.board = new ConnectFourBoard(canvas);
     }
-
-    this.playerTurnSubject.next(Math.floor(Math.random()*1) === 0 ? "o" : "x");
+    this.turn = Math.floor(Math.random()*2) === 0 ? "o" : "x"
+    this.playerTurnSubject.next(this.turn);
   }
 
   confirmMove(move : number[], piece: string) {
-    this.board.placePiece(move,piece,true)
+    this.board.placePiece(move,piece,true);
     this.board.drawBoardAndPieces();
     this.nextTurn();
   }
@@ -83,7 +83,8 @@ export class GameManagerService {
   }
 
   nextTurn() {
-    this.playerTurnSubject.next(this.turn === "x" ? "o" : "x");
+    this.turn = this.turn === "x" ? "o" : "x";
+    this.playerTurnSubject.next(this.turn);
   }
 
   setGameInfo(gameInfo : GameInfo) {

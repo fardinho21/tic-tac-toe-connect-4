@@ -29,8 +29,8 @@ export abstract class Board {
     abstract drawPieces();
 
     clearBoard() {
-        this.emptyBoard();
         this.context.clearRect(0,0,this.canvas.width, this.canvas.height);
+        this.canvasSubject.next(this.canvas);
     }
 
     placePiece(index: number[], playerPiece:string, isFinal : boolean) {

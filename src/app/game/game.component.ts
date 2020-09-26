@@ -16,7 +16,7 @@ export class GameComponent implements OnInit, OnDestroy, AfterViewInit {
   private gameInfoSubscription : Subscription; 
   private canvasSubscription : Subscription;
   private turnSubsription : Subscription;
-  private assignedPieceSubscription : Subscription;
+  private computerPieceSubscription : Subscription;
 
   @ViewChild('canvas', {static: false})
   private canvasElRef: ElementRef<HTMLCanvasElement>;
@@ -60,7 +60,7 @@ export class GameComponent implements OnInit, OnDestroy, AfterViewInit {
       this.turnBool = turn ===  this.playerPiece ? true : false;
     })
   
-    this.assignedPieceSubscription = this.gameManager.assignPieceSubject.subscribe(piece => {
+    this.computerPieceSubscription = this.gameManager.computerPieceSubject.subscribe(piece => {
       this.playerPiece = piece;
     })
   }
@@ -69,7 +69,9 @@ export class GameComponent implements OnInit, OnDestroy, AfterViewInit {
     this.gameInfoSubscription.unsubscribe();
     this.canvasSubscription.unsubscribe();
     this.turnSubsription.unsubscribe();
-    this.assignedPieceSubscription.unsubscribe();
+    this.computerPieceSubscription.unsubscribe();
+
+    this.clickedSpot = null;
   }
 
   ngAfterViewInit() {

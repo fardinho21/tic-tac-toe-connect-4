@@ -8,13 +8,22 @@ export class ComputerPlayer extends Player {
         
         this.playerTurnSubscription = this.gameManager.playerTurnSubject.subscribe(turn => {
             if (turn === this.piece) {
-                let result = this.play();
+                let result = this.thinkAboutMove();
                 this.decideOnMove(result)
             }
         })
     }
 
 
+    thinkAboutMove() : number[] {
+        let result = this.play();
+        let boardPiece = this.gameManager.board.getBoardPiece(result[0],result[1]);
+        while (boardPiece.piece != "" && this.gameManager.board.emptySpots > 0) {
+            result = this.play();
+            boardPiece = this.gameManager.board.getBoardPiece(result[0],result[1]);
+        }
+        return result;
+    }
 
     decideOnMove(choice: number[]) {
         this.gameManager.confirmMove(choice,this.piece)
