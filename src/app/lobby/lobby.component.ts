@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef, MatDialogState } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
 //components
 import { HostGameComponent } from "./host-game/host-game.component";

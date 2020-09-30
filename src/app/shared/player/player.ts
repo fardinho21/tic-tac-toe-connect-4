@@ -69,6 +69,6 @@ export class ComputerPlayer extends Player {
     }
 
     private playMiniMax() {
-        return [];
+        
     }
 }

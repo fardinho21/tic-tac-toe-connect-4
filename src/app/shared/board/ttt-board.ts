@@ -1,16 +1,28 @@
+import { throwMatDialogContentAlreadyAttachedError } from '@angular/material/dialog';
 import { Board } from "./abstract.board";
 
 export class TicTacToeBoard extends Board{
     
     constructor(canvas : HTMLCanvasElement) {
         super(canvas, 3, 3);
+        this.emptySpots = 9;
         this.drawBoardAndPieces();
         console.log(this.boardArray);
     }
 
-    checkForWinner() {
+    checkForWinner() : string {
 
+        let checkDiag1 = this.boardArray[0][0].piece === this.boardArray[1][1].piece && 
+                         this.boardArray[1][1].piece === this.boardArray[2][2].piece;
+        let checkDiag2 = this.boardArray[2][0].piece === this.boardArray[1][1].piece &&
+                         this.boardArray[1][1].piece === this.boardArray[0][2].piece
 
+        if (checkDiag1){
+            return this.boardArray[0][0].piece
+        } else if (checkDiag2) {
+            return this.boardArray[2][0].piece
+        }
+        return ""
     }
 
     drawBoard() {
