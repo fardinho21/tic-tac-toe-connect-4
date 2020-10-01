@@ -50,10 +50,10 @@ export class GameManagerService {
 
     const ginfo = this.gameInfo;
 
-    this.computerPiece = Math.floor(Math.random()*1) === 0 ? "o" : "x";
+    this.computerPiece = Math.floor(Math.random()*2) === 0 ? "o" : "x";
     
     if (ginfo.opponentPC) {
-      this.pc = new ComputerPlayer(this.computerPiece,false,"easy",this);
+      this.pc = new ComputerPlayer(this.computerPiece,false,ginfo.difficulty,this);
       this.computerPieceSubject.next(this.computerPiece === "x" ? "o" : "x");
     }
 
@@ -62,6 +62,7 @@ export class GameManagerService {
     } else if (ginfo.gameType === "CF") {
       this.board = new ConnectFourBoard(canvas);
     }
+    
     this.turn = Math.floor(Math.random()*2) === 0 ? "o" : "x"
     this.playerTurnSubject.next(this.turn);
   }

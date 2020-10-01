@@ -6,8 +6,8 @@ export class ConnectFourBoard extends Board{
         super(canvas, 7, 6);
     }
 
-    checkForWinner() {
-
+    checkForWinner() : string{
+        return ""
     }
     
     getBoardPiece(r:number,c:number){
@@ -24,5 +24,9 @@ export class ConnectFourBoard extends Board{
     
     clickBoard(x:number,y:number) {
         return {index: [], set: false, piece: ""}
+    }
+
+    rowColToString(rc : BoardPiece[]) {
+        return ""
     }
 }
