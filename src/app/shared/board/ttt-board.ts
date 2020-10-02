@@ -177,5 +177,17 @@ export class TicTacToeBoard extends Board{
         }).join("")
     }
 
+    print() {
+        let str = []
+        for (let r = 0; r < 3; r++) {
+            let rowStr = this.boardArray[r].map( (bp : BoardPiece) => {
+
+                return bp.piece ? bp.piece : "_"
+            })
+            str.push(rowStr.join(""))
+        }
+        return str;
+    }
+
 
 }

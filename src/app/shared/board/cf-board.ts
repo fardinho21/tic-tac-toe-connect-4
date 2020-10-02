@@ -29,4 +29,8 @@ export class ConnectFourBoard extends Board{
     rowColToString(rc : BoardPiece[]) {
         return ""
     }
+
+    print() {
+        return []
+    }
 }

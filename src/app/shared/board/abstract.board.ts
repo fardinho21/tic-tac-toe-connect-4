@@ -28,6 +28,7 @@ export abstract class Board {
     abstract clickBoard(x:number,y:number):BoardPiece;
     abstract getBoardPiece(r:number,c:number):BoardPiece;
     abstract drawBoard();
+    abstract print();
     abstract drawPieces();
 
     clearBoard() {
@@ -52,7 +53,7 @@ export abstract class Board {
     removePiece(index: number[]) {
         let bp : BoardPiece = this.boardArray[index[0]][index[1]];
 
-        if (!bp.set) {
+        if (bp.set) {
             console.log("piece is set. cannot be removed!")
             return
         }
