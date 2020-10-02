@@ -18,3 +18,16 @@ main {
 button {
     margin: auto;
 }
+
+#banner {
+    display: flex;
+    justify-content: space-around;
+}
+
+#banner h6 {
+    margin: auto;
+}
+
+.turn {
+    border: 3px solid blue;
+}

@@ -13,15 +13,29 @@ import { LobbyComponent } from "./lobby/lobby.component";
 import { HostGameComponent } from "./lobby/host-game/host-game.component";
 import { JoinGameComponent } from "./lobby/join-game/join-game.component";
 import { QuitGameComponent } from "./game/quit-game/quit-game.component";
+import { NotValidComponent } from "./game/not-valid/not-valid.component";
 import { AgainstPcComponent } from "./lobby/against-pc/against-pc.component";
+import { WaitingComponent } from "./lobby/waiting/waiting.component"
+import { LoadingComponent } from "./shared/loading/loading.component";
+import { ConfirmMoveComponent } from "./game/confirm-move/confirm-move.component";
 import { GameComponent } from "./game/game.component";
+import { GameEndComponent } from './game/game-end/game-end.component';
 
 
 declare global {
   export interface GameInfo {
-    playerName: string;
+    hostName: string;
     gameType: string;
     gameName: string;
+    opponentPC: boolean;
+    opponentName?: string;
+    host?: boolean;
+    difficulty? : string;
+  }
+  export interface BoardPiece {
+    index: number[];
+    set : boolean;
+    piece: string;
   }
 }
 
@@ -34,7 +48,12 @@ declare global {
     HostGameComponent,
     JoinGameComponent, 
     QuitGameComponent,
-    AgainstPcComponent
+    ConfirmMoveComponent,
+    AgainstPcComponent,
+    LoadingComponent,
+    WaitingComponent,
+    GameEndComponent,
+    NotValidComponent
   ],
   imports: [
     BrowserModule,
@@ -45,6 +64,15 @@ declare global {
   ],
   providers: [],
   bootstrap: [AppComponent],
-  entryComponents: [HostGameComponent, JoinGameComponent, QuitGameComponent, AgainstPcComponent]
+  entryComponents: [
+    HostGameComponent, 
+    JoinGameComponent, 
+    QuitGameComponent, 
+    AgainstPcComponent,
+    WaitingComponent,
+    NotValidComponent,
+    ConfirmMoveComponent,
+    GameEndComponent
+  ]
 })
 export class AppModule { }
