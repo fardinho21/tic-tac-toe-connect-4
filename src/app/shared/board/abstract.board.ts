@@ -21,11 +21,14 @@ export abstract class Board {
     public lengthOfCol : number; //number of spots in a row or column
     public lengthOfRow : number;
     public emptySpots : number;
+    public unsetAndEmptySpots : number; 
 
     abstract checkForWinner();
+    abstract rowColToString(rc : BoardPiece[]);
     abstract clickBoard(x:number,y:number):BoardPiece;
     abstract getBoardPiece(r:number,c:number):BoardPiece;
     abstract drawBoard();
+    abstract print();
     abstract drawPieces();
 
     clearBoard() {
@@ -38,17 +41,24 @@ export abstract class Board {
         boardPiece.piece = playerPiece;
         
         if (isFinal) {
-            this.emptySpots -= 1;
+            this.unsetAndEmptySpots -= 1;
             boardPiece.set = true;            
         }
 
         this.boardArray[index[0]][index[1]] = boardPiece;
+        this.emptySpots = this.emptySpots - 1 <= 0 ? 0 : this.emptySpots - 1;
 
     }
 
     removePiece(index: number[]) {
-        this.emptySpots += 1;
+        let bp : BoardPiece = this.boardArray[index[0]][index[1]];
+
+        if (bp.set) {
+            console.log("piece is set. cannot be removed!")
+            return
+        }
         this.boardArray[index[0]][index[1]] = {set : false, piece : "", index : index}
+        this.emptySpots++;
     }
     
     drawBoardAndPieces() {

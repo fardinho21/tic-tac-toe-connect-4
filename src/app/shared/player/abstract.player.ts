@@ -6,6 +6,7 @@ export abstract class Player {
 
     boardArray = [];
     playerTurnSubscription : Subscription
+    gameEndSubscription : Subscription
 
     constructor(protected piece : string, protected isHuman : boolean, protected mode : string = "easy", protected gameManager : GameManagerService=null) {
         this.mode = mode;

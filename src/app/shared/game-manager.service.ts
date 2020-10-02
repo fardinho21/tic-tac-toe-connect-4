@@ -14,13 +14,14 @@ export class GameManagerService {
   gameInfoSubject = new Subject<GameInfo>();
   playerTurnSubject = new Subject<string>();
   computerPieceSubject = new Subject<string>();
+  gameEndSubject = new Subject<string>();
 
   board : TicTacToeBoard | ConnectFourBoard = null;
   pc : ComputerPlayer;
 
   playerName : string ;
   turn : string;
-  
+  gameEnd : boolean = false;
 
   constructor() { }
 
@@ -50,10 +51,10 @@ export class GameManagerService {
 
     const ginfo = this.gameInfo;
 
-    this.computerPiece = Math.floor(Math.random()*1) === 0 ? "o" : "x";
+    this.computerPiece = Math.floor(Math.random()*2) === 0 ? "o" : "x";
     
     if (ginfo.opponentPC) {
-      this.pc = new ComputerPlayer(this.computerPiece,false,"easy",this);
+      this.pc = new ComputerPlayer(this.computerPiece,false,ginfo.difficulty,this);
       this.computerPieceSubject.next(this.computerPiece === "x" ? "o" : "x");
     }
 
@@ -62,14 +63,30 @@ export class GameManagerService {
     } else if (ginfo.gameType === "CF") {
       this.board = new ConnectFourBoard(canvas);
     }
+    
     this.turn = Math.floor(Math.random()*2) === 0 ? "o" : "x"
     this.playerTurnSubject.next(this.turn);
   }
 
   confirmMove(move : number[], piece: string) {
     this.board.placePiece(move,piece,true);
-    this.board.drawBoardAndPieces();
-    this.nextTurn();
+    let check = this.board.checkForWinner();
+    let movesLeft = this.board.unsetAndEmptySpots;
+    if (check != "") {
+      this.gameEnd = true;
+      this.board.drawBoardAndPieces();
+      this.gameEndSubject.next(check)
+
+    }
+    else if (!movesLeft) {
+      this.gameEnd = true;
+      this.board.drawBoardAndPieces();
+      this.gameEndSubject.next("draw")
+    } else {
+      this.board.drawBoardAndPieces();
+      this.nextTurn();
+    }
+
   }
 
   notFinalMove(move : number[], piece: string) {

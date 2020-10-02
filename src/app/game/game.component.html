@@ -15,7 +15,7 @@
 
     <section id="buttons">
         <button mat-flat-button color="accent" type="button" (click)="onQuitGame()">Quit Game</button>
-        <button mat-flat-button color="primary" type="button" [disabled]='!turnBool || !clickedSpot' (click)="onConfirmMove()">Confirm Move</button>
+        <button mat-flat-button color="primary" type="button" [disabled]='!turnBool || !clickedSpot || gameEnd' (click)="onConfirmMove()">Confirm Move</button>
     </section>
 
 </main>

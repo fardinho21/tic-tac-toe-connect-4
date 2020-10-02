@@ -1,16 +1,58 @@
+import { throwMatDialogContentAlreadyAttachedError } from '@angular/material/dialog';
+import { ɵangular_packages_platform_browser_dynamic_platform_browser_dynamic_a } from '@angular/platform-browser-dynamic';
 import { Board } from "./abstract.board";
 
 export class TicTacToeBoard extends Board{
     
     constructor(canvas : HTMLCanvasElement) {
         super(canvas, 3, 3);
+        this.emptySpots = 9;
+        this.unsetAndEmptySpots = 9;
         this.drawBoardAndPieces();
         console.log(this.boardArray);
     }
 
-    checkForWinner() {
+    checkForWinner() : string {
 
+        let checkDiag1 = this.boardArray[0][0].piece === this.boardArray[1][1].piece && 
+                         this.boardArray[1][1].piece === this.boardArray[2][2].piece;
+        let checkDiag2 = this.boardArray[2][0].piece === this.boardArray[1][1].piece &&
+                         this.boardArray[1][1].piece === this.boardArray[0][2].piece
 
+        if (checkDiag1){
+            return this.boardArray[0][0].piece
+        } else if (checkDiag2) {
+            return this.boardArray[2][0].piece
+        }
+        //check rows
+        for (let r = 0; r < 3; r++) {
+            let currentRow : BoardPiece[] = this.boardArray[r];
+            let str : string = this.rowColToString(currentRow)
+
+            if (str === "xxx") {
+                return "x"
+            } else if (str == "ooo") {
+                return "o"
+            }
+            
+        }
+
+        //check cols 
+        let row0 : BoardPiece[] = this.boardArray[0];
+        let row1 : BoardPiece[] = this.boardArray[1];
+        let row2 : BoardPiece[] = this.boardArray[2];
+
+        for (let c = 0; c < 3; c++) {
+            let currentCol : BoardPiece[] = [row0[c],row1[c],row2[c]]
+            let str : string = this.rowColToString(currentCol);
+
+            if (str === "xxx") {
+                return "x"
+            } else if (str == "ooo") {
+                return "o"
+            }
+        }
+        return ""
     }
 
     drawBoard() {
@@ -90,7 +132,6 @@ export class TicTacToeBoard extends Board{
     }
 
     getBoardPiece( r:number, c:number) : BoardPiece {
-        console.log(r,c)
         return this.boardArray[r][c]
     }
 
@@ -127,6 +168,25 @@ export class TicTacToeBoard extends Board{
         
         let piece = this.getBoardPiece(i,j);
         return piece;
+    }
+
+
+    rowColToString(rc : BoardPiece[]) {
+       return rc.map((rc : BoardPiece) => {
+            return rc.piece;
+        }).join("")
+    }
+
+    print() {
+        let str = []
+        for (let r = 0; r < 3; r++) {
+            let rowStr = this.boardArray[r].map( (bp : BoardPiece) => {
+
+                return bp.piece ? bp.piece : "_"
+            })
+            str.push(rowStr.join(""))
+        }
+        return str;
     }
 
 
