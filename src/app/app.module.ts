@@ -19,6 +19,7 @@ import { WaitingComponent } from "./lobby/waiting/waiting.component"
 import { LoadingComponent } from "./shared/loading/loading.component";
 import { ConfirmMoveComponent } from "./game/confirm-move/confirm-move.component";
 import { GameComponent } from "./game/game.component";
+import { GameEndComponent } from './game/game-end/game-end.component';
 
 
 declare global {
@@ -51,7 +52,7 @@ declare global {
     AgainstPcComponent,
     LoadingComponent,
     WaitingComponent,
-    
+    GameEndComponent,
     NotValidComponent
   ],
   imports: [
@@ -70,7 +71,8 @@ declare global {
     AgainstPcComponent,
     WaitingComponent,
     NotValidComponent,
-    ConfirmMoveComponent
+    ConfirmMoveComponent,
+    GameEndComponent
   ]
 })
 export class AppModule { }

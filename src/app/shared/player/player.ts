@@ -5,13 +5,21 @@ import { verifyHostBindings } from '@angular/compiler';
 
 export class ComputerPlayer extends Player {
 
+    gameEnd : boolean = false;
+
     constructor(piece : string, isHuman=false, mode : string = "easy", gm: GameManagerService =null){
         super(piece,isHuman,mode,gm)
         
         this.playerTurnSubscription = this.gameManager.playerTurnSubject.subscribe(turn => {
-            if (turn === this.piece) {
+            if (turn === this.piece && this.gameManager && !this.gameEnd) {
                 let result = this.play()
                 this.decideOnMove(result)
+            }
+        })
+
+        this.gameEndSubscription = this.gameManager.gameEndSubject.subscribe(result => {
+            if (result != "") {
+                this.gameEnd = true;
             }
         })
     }
@@ -41,6 +49,8 @@ export class ComputerPlayer extends Player {
         let piece = this.gameManager.board.getBoardPiece(r,c)
         while (piece.piece != "") {
             piece = this.gameManager.board.getBoardPiece(r,c);
+            r = Math.floor(Math.random()*3);
+            c = Math.floor(Math.random()*3);
         }
         return [r,c]
     }
