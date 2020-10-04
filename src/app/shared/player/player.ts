@@ -24,6 +24,10 @@ export class ComputerPlayer extends Player {
         })
     }
 
+    quitGame() {
+        this.gameEndSubscription.unsubscribe();
+        this.playerTurnSubscription.unsubscribe();
+    }
 
     decideOnMove(choice: number[]) {
         this.gameManager.confirmMove(choice,this.piece)
@@ -48,9 +52,9 @@ export class ComputerPlayer extends Player {
         let c = Math.floor(Math.random()*3);
         let piece = this.gameManager.board.getBoardPiece(r,c)
         while (piece.piece != "") {
-            piece = this.gameManager.board.getBoardPiece(r,c);
             r = Math.floor(Math.random()*3);
             c = Math.floor(Math.random()*3);
+            piece = this.gameManager.board.getBoardPiece(r,c);
         }
         return [r,c]
     }

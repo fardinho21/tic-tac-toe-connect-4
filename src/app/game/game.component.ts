@@ -25,13 +25,14 @@ export class GameComponent implements OnInit, OnDestroy, AfterViewInit {
   private canvasElRef: ElementRef<HTMLCanvasElement>;
   private canvas : HTMLCanvasElement;
   private context : CanvasRenderingContext2D;
-  private dialogRef: MatDialogRef<QuitGameComponent | NotValidComponent | ConfirmMoveComponent>;
+  private dialogRef: MatDialogRef<any>;
   private playerPiece : string;
   hostName : string = "host";
   opponentName : string = "opponent";
   turnBool : boolean = false;
   clickedSpot : number[];
   gameEnd : boolean = false;
+  
 
 
   constructor(private gameManager: GameManagerService, private dialog: MatDialog, private router: Router) { 
@@ -43,23 +44,23 @@ export class GameComponent implements OnInit, OnDestroy, AfterViewInit {
   ngOnInit(): void {
     //subscriptions
     this.gameInfoSubscription = this.gameManager.gameInfoSubject.subscribe(gameInfo => {
-      // this.hostName = gameInfo.hostName
-      // this.opponentName = gameInfo.opponentName;
 
       if (!gameInfo) {
+        
+        this.closeDialog();
+        this.turnBool = false;
+        this.playerPiece = null;
+        this.clickedSpot = null;
         this.router.navigate(['/lobby'])
       } 
-      this.dialogRef.close();
+
     })
 
     this.turnSubsription = this.gameManager.playerTurnSubject.subscribe(turn => {
       
       this.clickedSpot = null;
       
-      if (this.dialogRef) {
-        this.dialogRef.close();
-        this.dialogRef = null;
-      }
+      this.closeDialog();
 
       this.turnBool = turn ===  this.playerPiece ? true : false;
     })
@@ -69,6 +70,10 @@ export class GameComponent implements OnInit, OnDestroy, AfterViewInit {
     })
 
     this.gameEndSubscription = this.gameManager.gameEndSubject.subscribe(check => {
+
+      this.closeDialog();
+
+      this.gameEnd = true;
       this.onGameEnd(check)
     })
   }
@@ -78,9 +83,10 @@ export class GameComponent implements OnInit, OnDestroy, AfterViewInit {
     this.canvasSubscription.unsubscribe();
     this.turnSubsription.unsubscribe();
     this.computerPieceSubscription.unsubscribe();
-    this.dialogRef.close()
-    this.dialogRef = null;
+    this.closeDialog();
     this.clickedSpot = null;
+    this.gameManager = null;
+    
   }
 
   ngAfterViewInit() {
@@ -138,7 +144,6 @@ export class GameComponent implements OnInit, OnDestroy, AfterViewInit {
 
   onConfirmMove() {
     this.dialogRef = this.dialog.open(ConfirmMoveComponent, {data: [this.clickedSpot,this.playerPiece]})
-    this.clickedSpot = null;
   }
 
   onQuitGame() {
@@ -149,4 +154,10 @@ export class GameComponent implements OnInit, OnDestroy, AfterViewInit {
     this.dialogRef = this.dialog.open(GameEndComponent, {data: {result: result, piece: this.playerPiece}} )
   }
 
+  closeDialog() {
+    if (this.dialogRef) {
+      this.dialogRef.close()
+    }
+    this.dialogRef=null;
+  }
 }

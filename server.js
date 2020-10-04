@@ -1,7 +1,6 @@
 const { debug } = require("console");
 const http = require("http"); //default nodejs package
 const app = require("./backend/app") //import express app
-const debug = require("debug")("node-angular")
 
 /// error handling functions start///
 const normalizePort = val => {

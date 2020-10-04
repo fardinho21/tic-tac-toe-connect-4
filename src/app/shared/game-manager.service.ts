@@ -42,20 +42,24 @@ export class GameManagerService {
     this.clearGameInfo();
     this.board.clearBoard();
     this.board.emptyBoard();
-    delete this.board;
-    delete this.pc;
+    this.pc.quitGame();
+    this.gameEnd = false;
+    this.board = null;
+    this.pc = null;
+    this.computerPiece = "";
     this.turn = "";
   }
 
   startGame(canvas : HTMLCanvasElement) {
-
+    this.gameEnd = false;
     const ginfo = this.gameInfo;
 
     this.computerPiece = Math.floor(Math.random()*2) === 0 ? "o" : "x";
     
     if (ginfo.opponentPC) {
       this.pc = new ComputerPlayer(this.computerPiece,false,ginfo.difficulty,this);
-      this.computerPieceSubject.next(this.computerPiece === "x" ? "o" : "x");
+      let playerPiece = this.computerPiece === "x" ? "o" : "x";
+      this.computerPieceSubject.next(playerPiece);
     }
 
     if (ginfo.gameType === "TTT") {
@@ -68,21 +72,23 @@ export class GameManagerService {
     this.playerTurnSubject.next(this.turn);
   }
 
+  endGame(check : string) {
+    this.gameEnd = true;
+    this.board.drawBoardAndPieces();
+    this.gameEndSubject.next(check)
+  }
+
   confirmMove(move : number[], piece: string) {
     this.board.placePiece(move,piece,true);
     let check = this.board.checkForWinner();
     let movesLeft = this.board.unsetAndEmptySpots;
     if (check != "") {
-      this.gameEnd = true;
-      this.board.drawBoardAndPieces();
-      this.gameEndSubject.next(check)
-
+      this.endGame(check)
     }
     else if (!movesLeft) {
-      this.gameEnd = true;
-      this.board.drawBoardAndPieces();
-      this.gameEndSubject.next("draw")
-    } else {
+      this.endGame("draw") 
+    } 
+    else {
       this.board.drawBoardAndPieces();
       this.nextTurn();
     }
@@ -117,5 +123,5 @@ export class GameManagerService {
     this.gameInfo = null;
     this.gameInfoSubject.next(this.gameInfo);
   }
-
+  
 }

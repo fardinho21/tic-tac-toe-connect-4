@@ -28,7 +28,7 @@ export abstract class Board {
     abstract clickBoard(x:number,y:number):BoardPiece;
     abstract getBoardPiece(r:number,c:number):BoardPiece;
     abstract drawBoard();
-    abstract print();
+    abstract printBoard();
     abstract drawPieces();
 
     clearBoard() {

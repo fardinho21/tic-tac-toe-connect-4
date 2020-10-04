@@ -21,6 +21,8 @@ import { ConfirmMoveComponent } from "./game/confirm-move/confirm-move.component
 import { GameComponent } from "./game/game.component";
 import { GameEndComponent } from './game/game-end/game-end.component';
 
+import { HttpClientModule } from "@angular/common/http";
+import { GameManagerService } from './shared/game-manager.service';
 
 declare global {
   export interface GameInfo {
@@ -60,9 +62,10 @@ declare global {
     BrowserAnimationsModule,
     FormsModule,
     RoutingModule,
-    MaterialModule
+    MaterialModule,
+    HttpClientModule
   ],
-  providers: [],
+  providers: [GameManagerService],
   bootstrap: [AppComponent],
   entryComponents: [
     HostGameComponent, 
