@@ -14,36 +14,11 @@ export class TicTacToeBoard extends Board{
 
     checkForWinner() : string {
 
-        let checkDiag1 = false;
-        let checkDiag2 = false;
-        let prevP1 = null;
-        let prevP2 = null;
-        for (let d = 0; d < 3; d++) {
-
-            let p1 = this.boardArray[d][d].piece
-            let p2 = this.boardArray[2 - d][d].piece
-
-            if (prevP1 === null) {
-                prevP1 = p1;
-            } else if (prevP1 != p1){
-                checkDiag1 = false;
-            } else if (prevP1 === p1) {
-                checkDiag1 = true;
-            }
-
-
-
-            if (prevP2 === null) {
-                prevP2 = p2;
-            } else if (prevP2 != p2) {
-                checkDiag2 = false;
-            } else if (prevP2 === p2) {
-                checkDiag2 = true;
-            }
-
-
-        }
-
+        const checkDiag1 = this.boardArray[0][0].piece === this.boardArray[1][1].piece &&
+                           this.boardArray[1][1].piece === this.boardArray[2][2].piece
+        const checkDiag2 = this.boardArray[2][0].piece === this.boardArray[1][1].piece &&
+                           this.boardArray[1][1].piece === this.boardArray[0][2].piece
+        
         if (checkDiag1){
             return this.boardArray[0][0].piece
         } else if (checkDiag2) {

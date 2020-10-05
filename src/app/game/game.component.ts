@@ -83,6 +83,7 @@ export class GameComponent implements OnInit, OnDestroy, AfterViewInit {
     this.canvasSubscription.unsubscribe();
     this.turnSubsription.unsubscribe();
     this.computerPieceSubscription.unsubscribe();
+    this.gameEndSubscription.unsubscribe();
     this.closeDialog();
     this.clickedSpot = null;
     this.gameManager = null;
