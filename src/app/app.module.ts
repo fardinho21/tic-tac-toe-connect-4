@@ -30,14 +30,30 @@ declare global {
     gameType: string;
     gameName: string;
     opponentPC: boolean;
+    userId?: string;
+    playersReady?: boolean;
     opponentName?: string;
     host?: boolean;
     difficulty? : string;
+
   }
   export interface BoardPiece {
     index: number[];
     set : boolean;
     piece: string;
+  }
+
+  export interface BackendResponse {
+    message: string,
+    status: number,
+    username?: string,
+    userId?: string,
+    token?: any,
+    error?:  string,
+    extra?: any,
+    gameList?: any,
+    move?: number[],
+    gameEnd?: boolean
   }
 }
 

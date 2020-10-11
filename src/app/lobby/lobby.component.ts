@@ -9,6 +9,7 @@ import { WaitingComponent } from "./waiting/waiting.component";
 //services
 import { ManagerService } from "../shared/manager.service";
 import { GameManagerService } from '../shared/game-manager.service';
+import { BackendService } from "../shared/backend.service";
 //rxjs
 import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
@@ -23,7 +24,8 @@ export class LobbyComponent implements OnInit, OnDestroy {
 
   //subscriptions
   gameInfoSubscription : Subscription;
-
+  backendSubscription : Subscription;
+  checkDataBase : number
   
   dataSource = new MatTableDataSource<GameInfo>();
   displayedColumns = ["gameName" ,"hostName", "gameType"];
@@ -33,13 +35,10 @@ export class LobbyComponent implements OnInit, OnDestroy {
     private dialog : MatDialog, 
     private manager: ManagerService, 
     private gameManager: GameManagerService,
-    private router: Router) { }
+    private router: Router,
+    private databaseManager: BackendService) { }
 
   ngOnInit(): void {
-    this.dataSource.data = [
-      {hostName: "funkMaster100", gameType: "TicTacToe", gameName: "You cant beat", opponentPC: false},
-      {hostName: "connect4Mstr", gameType: "Connect4", gameName: "Casual", opponentPC: false}
-    ];//dummy data
 
     this.gameInfoSubscription = this.gameManager.gameInfoSubject.subscribe(gameInfo => {
       //check close the dialog
@@ -52,23 +51,44 @@ export class LobbyComponent implements OnInit, OnDestroy {
         this.router.navigate(['/game']);
       }
 
-      
-      if (gameInfo.host) {
-        this.dialogRef = this.dialog.open(WaitingComponent, {data :  "Waiting for opponent."})
-
-        setTimeout(() => {
-          this.dialogRef.close()
-          this.dialogRef = null;
-          this.router.navigate(['/game'])
-        }, 4000);
-      } 
-
-
+      if (gameInfo.playersReady) {
+        this.router.navigate(['/game'])
+      } else  {
+        if (gameInfo.hostName === this.gameManager.playerName) {
+          this.dialogRef = this.dialog.open(WaitingComponent, {data :  {message: "Waiting for client to join.", isHost: true}})
+        } else {
+          this.dialogRef = this.dialog.open(WaitingComponent, {data :  {message: "Waiting for host's response.", isHost: false}})
+        }
+      }
     })
+
+    this.backendSubscription = this.databaseManager.backendSubject.subscribe(brResponse => {
+      if (brResponse.extra === "logoutUser") {
+        this.router.navigate(["/title"])
+      } else if (brResponse.extra === "gameList") {
+        clearInterval(this.checkDataBase)
+        this.setGameList(brResponse)
+        this.startDBQueryInterval();
+      } else if (brResponse.extra === "gameDeleted") {
+        clearInterval(this.checkDataBase)
+        this.setGameList(brResponse)
+        this.startDBQueryInterval();
+      }
+    })
+
+    this.databaseManager.fetchGameList();
+    this.startDBQueryInterval();
   }
 
   ngOnDestroy() {
     this.gameInfoSubscription.unsubscribe();
+    this.backendSubscription.unsubscribe();
+    clearInterval(this.checkDataBase);
+  }
+
+  onExit() {
+    
+    this.databaseManager.logOut();
   }
 
   onHostGame() {
@@ -86,5 +106,32 @@ export class LobbyComponent implements OnInit, OnDestroy {
 
   getUserName() {
     return this.gameManager.playerName;
+  }
+
+  setGameList(brResponse : BackendResponse) {
+
+    if (brResponse.gameList.length === 0) {
+      this.dataSource.data = []
+      return;
+    }
+
+    let gl : GameInfo[] = brResponse.gameList.map(document => {
+      return {
+        hostName: document.host,
+        gameType: document.gameType,
+        gameName: document.gameName,
+        userId: document.hostId
+      }
+    })
+
+    this.dataSource.data = gl;
+  }
+
+  startDBQueryInterval() {
+    this.checkDataBase = setInterval(() => {
+      console.log("fetching games")
+      this.databaseManager.fetchGameList();
+    },
+    500)
   }
 }

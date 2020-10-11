@@ -8,3 +8,8 @@ main {
     height: 50%;
     
 }
+
+#confirm {
+    display: flex;
+    justify-content: space-evenly;
+}
