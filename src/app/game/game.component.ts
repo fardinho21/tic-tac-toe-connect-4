@@ -7,7 +7,7 @@ import { QuitGameComponent } from './quit-game/quit-game.component';
 import { NotValidComponent } from './not-valid/not-valid.component';
 import { ConfirmMoveComponent } from "./confirm-move/confirm-move.component";
 import { GameEndComponent } from "./game-end/game-end.component";
-import { stringify } from '@angular/compiler/src/util';
+import { BackendService } from '../shared/backend.service';
 @Component({
   selector: 'app-game',
   templateUrl: './game.component.html',
@@ -19,6 +19,7 @@ export class GameComponent implements OnInit, OnDestroy, AfterViewInit {
   private canvasSubscription : Subscription;
   private turnSubsription : Subscription;
   private computerPieceSubscription : Subscription;
+  private backendSubscription : Subscription;
   gameEndSubscription : Subscription;
 
   @ViewChild('canvas', {static: false})
@@ -32,13 +33,14 @@ export class GameComponent implements OnInit, OnDestroy, AfterViewInit {
   turnBool : boolean = false;
   clickedSpot : number[];
   gameEnd : boolean = false;
+  gInfo : GameInfo;
   
+  dbQueryInterval : number;
 
-
-  constructor(private gameManager: GameManagerService, private dialog: MatDialog, private router: Router) { 
-    const gInfo = gameManager.getGameInfo();
-    this.hostName = gInfo.hostName;
-    this.opponentName = gInfo.opponentPC ? "Computer" : gInfo.opponentName;
+  constructor(private gameManager: GameManagerService, private backendManager : BackendService, private dialog: MatDialog, private router: Router) { 
+    this.gInfo = gameManager.getGameInfo();
+    this.hostName = this.gInfo.hostName;
+    this.opponentName = this.gInfo.opponentPC ? "Computer" : this.gInfo.opponentName;
   }
 
   ngOnInit(): void {
@@ -65,9 +67,12 @@ export class GameComponent implements OnInit, OnDestroy, AfterViewInit {
       this.turnBool = turn ===  this.playerPiece ? true : false;
     })
   
-    this.computerPieceSubscription = this.gameManager.computerPieceSubject.subscribe(piece => {
-      this.playerPiece = piece;
-    })
+    if (this.opponentName == "Computer" ) {
+      this.computerPieceSubscription = this.gameManager.computerPieceSubject.subscribe(piece => {
+        this.playerPiece = piece;
+      })
+
+    }
 
     this.gameEndSubscription = this.gameManager.gameEndSubject.subscribe(check => {
 
@@ -76,6 +81,18 @@ export class GameComponent implements OnInit, OnDestroy, AfterViewInit {
       this.gameEnd = true;
       this.onGameEnd(check)
     })
+
+    if (this.opponentName != "Computer" || !this.gInfo.opponentPC) {
+
+      this.backendSubscription = this.backendManager.backendSubject.subscribe(response => {
+        if (response.extra === "gameStarted") {
+
+        } 
+      })
+
+      this.backendManager.startGame(this.gInfo);
+
+    }
   }
 
   ngOnDestroy() {
@@ -160,5 +177,11 @@ export class GameComponent implements OnInit, OnDestroy, AfterViewInit {
       this.dialogRef.close()
     }
     this.dialogRef=null;
+  }
+
+  startDBQueryInterval() {
+    this.dbQueryInterval = setInterval(() => {
+      this.backendManager.checkGameState();
+    }, 1000);
   }
 }

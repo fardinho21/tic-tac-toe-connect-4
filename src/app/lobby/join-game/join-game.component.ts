@@ -19,7 +19,7 @@ export class JoinGameComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     console.log(this.gameInfo)
-    this.backendSubscription = this.backendManager.backendSubject.subscribe((brResponse : BackendResponse)=> {
+    this.backendSubscription = this.backendManager.getBackEndSubject().subscribe((brResponse : BackendResponse)=> {
       if (brResponse.extra === "gameFound:Waiting") {
         this.gameManager.setGameInfo(this.gameInfo);
       }
@@ -32,6 +32,7 @@ export class JoinGameComponent implements OnInit, OnDestroy {
 
 
   onJoin() {
+    
     this.backendManager.joinGame(this.gameInfo, this.gameManager.playerName)
   }
 }

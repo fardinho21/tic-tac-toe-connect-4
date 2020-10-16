@@ -1,5 +1,3 @@
-import { throwMatDialogContentAlreadyAttachedError } from '@angular/material/dialog';
-import { ɵangular_packages_platform_browser_dynamic_platform_browser_dynamic_a } from '@angular/platform-browser-dynamic';
 import { Board } from "./abstract.board";
 
 export class TicTacToeBoard extends Board{

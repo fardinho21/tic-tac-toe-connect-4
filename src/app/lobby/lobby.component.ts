@@ -47,13 +47,18 @@ export class LobbyComponent implements OnInit, OnDestroy {
         this.dialogRef = null;
       }
 
-      if (gameInfo.opponentPC){
-        this.router.navigate(['/game']);
+      if (gameInfo.gameName === null) {
+        return
       }
 
+      if (gameInfo.opponentPC){
+        this.router.navigate(['/game']);
+      }    
+
       if (gameInfo.playersReady) {
+        clearInterval(this.checkDataBase);
         this.router.navigate(['/game'])
-      } else  {
+      } else if (!gameInfo.playersReady) {
         if (gameInfo.hostName === this.gameManager.playerName) {
           this.dialogRef = this.dialog.open(WaitingComponent, {data :  {message: "Waiting for client to join.", isHost: true}})
         } else {
@@ -62,7 +67,7 @@ export class LobbyComponent implements OnInit, OnDestroy {
       }
     })
 
-    this.backendSubscription = this.databaseManager.backendSubject.subscribe(brResponse => {
+    this.backendSubscription = this.databaseManager.getBackEndSubject().subscribe(brResponse => {
       if (brResponse.extra === "logoutUser") {
         this.router.navigate(["/title"])
       } else if (brResponse.extra === "gameList") {
@@ -71,23 +76,23 @@ export class LobbyComponent implements OnInit, OnDestroy {
         this.startDBQueryInterval();
       } else if (brResponse.extra === "gameDeleted") {
         clearInterval(this.checkDataBase)
+        this.gameManager.clearGameInfo();
         this.setGameList(brResponse)
         this.startDBQueryInterval();
       }
     })
 
-    this.databaseManager.fetchGameList();
     this.startDBQueryInterval();
   }
 
   ngOnDestroy() {
     this.gameInfoSubscription.unsubscribe();
     this.backendSubscription.unsubscribe();
-    clearInterval(this.checkDataBase);
+    
   }
 
   onExit() {
-    
+
     this.databaseManager.logOut();
   }
 
@@ -101,6 +106,9 @@ export class LobbyComponent implements OnInit, OnDestroy {
   }
 
   onClickRow(row : GameInfo) {
+    if (row.inSession) {
+      return;
+    }
     this.dialogRef = this.dialog.open(JoinGameComponent, {data: row});
   }
 

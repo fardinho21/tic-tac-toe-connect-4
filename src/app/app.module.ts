@@ -30,6 +30,7 @@ declare global {
     gameType: string;
     gameName: string;
     opponentPC: boolean;
+    inSession?: boolean;
     userId?: string;
     playersReady?: boolean;
     opponentName?: string;
@@ -47,6 +48,7 @@ declare global {
     message: string,
     status: number,
     username?: string,
+    client?: string,
     userId?: string,
     token?: any,
     error?:  string,

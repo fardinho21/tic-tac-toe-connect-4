@@ -9,10 +9,13 @@
         <app-loading *ngIf="!confirm"></app-loading>
     </section>
 
-    <div *ngIf="!confirm">
-        <button mat-flat-button mat-dialog-close color="accent" type="button" >Back</button>
+    <div *ngIf="!confirm && !denied">
+        <button mat-flat-button color="accent" type="button" (click)="toLobby()">To Lobby</button>
     </div>
-    <div *ngIf="confirm" id="confirm">
+    <div *ngIf="denied">
+        <button mat-flat-button color="accent" type="button" (click)="onDenied()">Okay</button>
+    </div>
+    <div *ngIf="confirm && !denied" id="confirm">
         <button mat-flat-button color="accent" type="button" (click)="no()">No</button>
         <button mat-flat-button color="primary" type="button" (click)="yes()">Yes</button>
     </div>

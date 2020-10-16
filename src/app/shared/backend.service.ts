@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
-import { Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { Router } from "@angular/router";
 
 
@@ -15,6 +15,10 @@ export class BackendService {
   userId: string;
   private BASE_URL : string = "http://localhost:3000/api/";
   constructor(private http : HttpClient) { }
+
+  getBackEndSubject() : Observable<BackendResponse> {
+    return this.backendSubject.asObservable();
+  }
 
   logIn(username : string) {
 
@@ -78,23 +82,27 @@ export class BackendService {
       })
   }
 
-  cancelWaiting() {
-    
+  cancelWaiting(gInfo: GameInfo, isHost: boolean) {
+    this.http.post<BackendResponse>(
+      this.BASE_URL + "lobby/cancelWaiting",
+      {
+        hostName: gInfo.hostName, 
+        hostId: gInfo.userId, 
+        gameName: gInfo.gameName,
+        isHost: isHost
+      })
+      .subscribe(response => {
+        this.backendSubject.next(response)
+      })
   }
 
   confirmClient(gInfo : GameInfo, hostId: string) {
-    this.http.put<BackendResponse>(
+    this.http.post<BackendResponse>(
       this.BASE_URL + "lobby/hostGame/hostConfirm",
       {
-        filter: {host: gInfo.hostName, hostId: hostId, gameName: gInfo.gameName},
-        update: {
-          host: gInfo.hostName, 
-          hostId: hostId, 
-          gameName: gInfo.gameName,
-          gameType: gInfo.gameType,
-          hostConfirm: 1,
-          clientWaiting: true
-        }
+        hostName: gInfo.hostName, 
+        hostId: hostId, 
+        gameName: gInfo.gameName,
       })
       .subscribe(response => {
         console.log(response)
@@ -102,13 +110,52 @@ export class BackendService {
       }) 
   }
 
+  denyClient(gInfo: GameInfo, hostId: string) {
+    this.http.post<BackendResponse>(
+      this.BASE_URL + "lobby/hostGame/hostDeny",
+      {
+        hostName: gInfo.hostName, 
+        hostId: hostId, 
+        gameName: gInfo.gameName,
+      })
+      .subscribe(response => {
+        this.backendSubject.next(response);
+      })
+  }
+
   check(gInfo : GameInfo, hostId: string, isHost: boolean) {
 
-    this.http.get<BackendResponse>(
-      this.BASE_URL + `lobby/check/${gInfo.hostName}/${hostId}/${gInfo.gameType}/${isHost.valueOf()}`
+    this.http.post<BackendResponse>(
+      this.BASE_URL + "lobby/check",
+      {
+        hostName: gInfo.hostName,
+        hostId: hostId,
+        gameName: gInfo.gameName,
+        isHost: isHost
+      }
     ).subscribe(response => {
       this.backendSubject.next(response)
     })
+  }
+
+  checkGameState() {
+    this.http.post<BackendResponse>(
+      this.BASE_URL + "/gameplay/check",
+      {
+
+      }
+    ) 
+  }
+
+  startGame(gInfo: GameInfo) {
+    this.http.post<BackendResponse>(
+      this.BASE_URL + "/gameplay/startGame",
+      {
+        gameMode: gInfo.gameType,
+        hostName: gInfo.hostName,
+        clientName: gInfo.opponentName
+      }
+    )
   }
 
   fetchGameList() {
