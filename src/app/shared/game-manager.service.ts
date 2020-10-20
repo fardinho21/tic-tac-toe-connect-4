@@ -44,23 +44,27 @@ export class GameManagerService {
 
   quitGame() {
     
-    this.clearGameInfo();
-    this.board.clearBoard();
-    this.board.emptyBoard();
-    this.pc.quitGame();
+    if (this.board) {
+      this.board.clearBoard();
+      this.board.emptyBoard();
+    }
+
+    if (this.pc) {
+      this.pc.quitGame();
+      this.pc = null;
+    }
     this.gameEnd = false;
     this.board = null;
-    this.pc = null;
     this.computerPiece = "";
     this.turn = "";
+    this.clearGameInfo();
+
   }
 
   startGame(canvas : HTMLCanvasElement) {
     this.gameEnd = false;
     const ginfo = this.gameInfo;
 
-    
-    
     if (ginfo.opponentPC) {
       this.pc = new ComputerPlayer(this.computerPiece,false,ginfo.difficulty,this);
       this.computerPiece = Math.floor(Math.random()*2) === 0 ? "o" : "x";
@@ -80,9 +84,14 @@ export class GameManagerService {
   }
 
   endGame(check : string) {
-    this.gameEnd = true;
-    this.board.drawBoardAndPieces();
-    this.gameEndSubject.next(check)
+    try {
+      this.gameEnd = true;
+      this.board.drawBoardAndPieces();
+      this.gameEndSubject.next(check)
+    } catch (err) {
+      console.log(err)
+    }
+
   }
 
   confirmMove(move : number[], piece: string) {
@@ -130,5 +139,5 @@ export class GameManagerService {
     this.gameInfo = {gameName: null, gameType: null, opponentPC: null, hostName: null}
     this.gameInfoSubject.next(this.gameInfo);
   }
-  
+
 }

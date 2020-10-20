@@ -21,6 +21,7 @@ export class JoinGameComponent implements OnInit, OnDestroy {
     console.log(this.gameInfo)
     this.backendSubscription = this.backendManager.getBackEndSubject().subscribe((brResponse : BackendResponse)=> {
       if (brResponse.extra === "gameFound:Waiting") {
+        this.gameInfo.inSession = true;
         this.gameManager.setGameInfo(this.gameInfo);
       }
     })

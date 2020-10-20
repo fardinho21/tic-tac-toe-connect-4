@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
 import { Observable, Subject } from 'rxjs';
 import { Router } from "@angular/router";
+import { TicTacToeBoard } from './board/ttt-board';
+import { ConnectFourBoard } from './board/cf-board';
 
 
 @Injectable({
@@ -138,24 +140,59 @@ export class BackendService {
     })
   }
 
-  checkGameState() {
+  checkGameState(gInfo: GameInfo, isHost: boolean) {
     this.http.post<BackendResponse>(
-      this.BASE_URL + "/gameplay/check",
-      {
-
-      }
-    ) 
-  }
-
-  startGame(gInfo: GameInfo) {
-    this.http.post<BackendResponse>(
-      this.BASE_URL + "/gameplay/startGame",
+      this.BASE_URL + "gameplay/check",
       {
         gameMode: gInfo.gameType,
         hostName: gInfo.hostName,
-        clientName: gInfo.opponentName
-      }
-    )
+        clientName: gInfo.opponentName,
+        isHost: isHost
+      }).subscribe(response => {
+        this.backendSubject.next(response)
+      }) 
+  }
+
+  confirmMove(gInfo: GameInfo, isHost: boolean, move: number[]) {
+    this.http.post<BackendResponse>(
+      this.BASE_URL + "gameplay/confirmMove",
+      {
+        gameMode: gInfo.gameType,
+        hostName: gInfo.hostName,
+        clientName: gInfo.opponentName,
+        isHost: isHost,
+        move: move
+      }).subscribe(response => {
+        this.backendSubject.next(response);
+      })
+  }
+
+  declareWinner(gInfo: GameInfo, check : string, isHost: boolean) {
+    this.http.post<BackendResponse>(
+      this.BASE_URL + "gameplay/declareWinner",
+      {
+        gameMode: gInfo.gameType,
+        hostName: gInfo.hostName,
+        clientName: gInfo.opponentName,
+        isHost: isHost,
+        check: check
+      }).subscribe(response => {
+        this.backendSubject.next(response)
+      })
+
+  }
+
+  startGame(gInfo: GameInfo, board: TicTacToeBoard | ConnectFourBoard) {
+    this.http.post<BackendResponse>(
+      this.BASE_URL + "gameplay/startGame",
+      {
+        gameMode: gInfo.gameType,
+        hostName: gInfo.hostName,
+        clientName: gInfo.opponentName,
+        board: board.boardArray
+      }).subscribe(response => {
+        this.backendSubject.next(response)
+      })
   }
 
   fetchGameList() {
@@ -177,6 +214,19 @@ export class BackendService {
     ).subscribe(response => {
       this.backendSubject.next(response)
     })
+  }
+
+  deleteGameState(gameState : GameState) {
+    this.http.post<BackendResponse>(
+      this.BASE_URL + "gameplay/deleteGameState",
+        {
+          gameMode: gameState.gameMode,
+          hostName: gameState.hostName,
+          clientName: gameState.clientName
+        }
+      ).subscribe(response => {
+        this.backendSubject.next(response)
+      })
   }
 
 }

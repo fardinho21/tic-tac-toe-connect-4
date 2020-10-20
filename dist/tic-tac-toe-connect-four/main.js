@@ -359,10 +359,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _confirm_move_confirm_move_component__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./confirm-move/confirm-move.component */ "./src/app/game/confirm-move/confirm-move.component.ts");
 /* harmony import */ var _game_end_game_end_component__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./game-end/game-end.component */ "./src/app/game/game-end/game-end.component.ts");
 /* harmony import */ var _shared_game_manager_service__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../shared/game-manager.service */ "./src/app/shared/game-manager.service.ts");
-/* harmony import */ var _angular_material_dialog__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @angular/material/dialog */ "./node_modules/@angular/material/__ivy_ngcc__/fesm2015/dialog.js");
-/* harmony import */ var _angular_router__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @angular/router */ "./node_modules/@angular/router/__ivy_ngcc__/fesm2015/router.js");
-/* harmony import */ var _angular_common__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @angular/common */ "./node_modules/@angular/common/__ivy_ngcc__/fesm2015/common.js");
-/* harmony import */ var _angular_material_button__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @angular/material/button */ "./node_modules/@angular/material/__ivy_ngcc__/fesm2015/button.js");
+/* harmony import */ var _shared_backend_service__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../shared/backend.service */ "./src/app/shared/backend.service.ts");
+/* harmony import */ var _angular_material_dialog__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @angular/material/dialog */ "./node_modules/@angular/material/__ivy_ngcc__/fesm2015/dialog.js");
+/* harmony import */ var _angular_router__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @angular/router */ "./node_modules/@angular/router/__ivy_ngcc__/fesm2015/router.js");
+/* harmony import */ var _angular_common__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @angular/common */ "./node_modules/@angular/common/__ivy_ngcc__/fesm2015/common.js");
+/* harmony import */ var _angular_material_button__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @angular/material/button */ "./node_modules/@angular/material/__ivy_ngcc__/fesm2015/button.js");
+
 
 
 
@@ -377,17 +379,18 @@ __webpack_require__.r(__webpack_exports__);
 const _c0 = ["canvas"];
 const _c1 = function (a0) { return { turn: a0 }; };
 class GameComponent {
-    constructor(gameManager, dialog, router) {
+    constructor(gameManager, backendManager, dialog, router) {
         this.gameManager = gameManager;
+        this.backendManager = backendManager;
         this.dialog = dialog;
         this.router = router;
         this.hostName = "host";
         this.opponentName = "opponent";
         this.turnBool = false;
         this.gameEnd = false;
-        const gInfo = gameManager.getGameInfo();
-        this.hostName = gInfo.hostName;
-        this.opponentName = gInfo.opponentPC ? "Computer" : gInfo.opponentName;
+        this.gInfo = gameManager.getGameInfo();
+        this.hostName = this.gInfo.hostName;
+        this.opponentName = this.gInfo.opponentPC ? "Computer" : this.gInfo.opponentName;
     }
     ngOnInit() {
         //subscriptions
@@ -405,14 +408,23 @@ class GameComponent {
             this.closeDialog();
             this.turnBool = turn === this.playerPiece ? true : false;
         });
-        this.computerPieceSubscription = this.gameManager.computerPieceSubject.subscribe(piece => {
-            this.playerPiece = piece;
-        });
+        if (this.opponentName == "Computer") {
+            this.computerPieceSubscription = this.gameManager.computerPieceSubject.subscribe(piece => {
+                this.playerPiece = piece;
+            });
+        }
         this.gameEndSubscription = this.gameManager.gameEndSubject.subscribe(check => {
             this.closeDialog();
             this.gameEnd = true;
             this.onGameEnd(check);
         });
+        if (this.opponentName != "Computer" || !this.gInfo.opponentPC) {
+            this.backendSubscription = this.backendManager.backendSubject.subscribe(response => {
+                if (response.extra === "gameStarted") {
+                    console.log(response.gameState);
+                }
+            });
+        }
     }
     ngOnDestroy() {
         this.gameInfoSubscription.unsubscribe();
@@ -429,6 +441,7 @@ class GameComponent {
         this.canvas.width = window.innerWidth * 0.7;
         this.canvas.height = window.innerHeight * 0.8;
         this.gameManager.startGame(this.canvas);
+        this.backendManager.startGame(this.gInfo, this.gameManager.board);
         //subscriptions
         this.canvasSubscription = this.gameManager.board.canvasSubject.subscribe((canvas) => {
             this.canvas = canvas;
@@ -479,8 +492,13 @@ class GameComponent {
         }
         this.dialogRef = null;
     }
+    startDBQueryInterval() {
+        this.dbQueryInterval = setInterval(() => {
+            this.backendManager.checkGameState();
+        }, 1000);
+    }
 }
-GameComponent.ɵfac = function GameComponent_Factory(t) { return new (t || GameComponent)(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_shared_game_manager_service__WEBPACK_IMPORTED_MODULE_5__["GameManagerService"]), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_angular_material_dialog__WEBPACK_IMPORTED_MODULE_6__["MatDialog"]), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_angular_router__WEBPACK_IMPORTED_MODULE_7__["Router"])); };
+GameComponent.ɵfac = function GameComponent_Factory(t) { return new (t || GameComponent)(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_shared_game_manager_service__WEBPACK_IMPORTED_MODULE_5__["GameManagerService"]), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_shared_backend_service__WEBPACK_IMPORTED_MODULE_6__["BackendService"]), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_angular_material_dialog__WEBPACK_IMPORTED_MODULE_7__["MatDialog"]), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_angular_router__WEBPACK_IMPORTED_MODULE_8__["Router"])); };
 GameComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"]({ type: GameComponent, selectors: [["app-game"]], viewQuery: function GameComponent_Query(rf, ctx) { if (rf & 1) {
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵviewQuery"](_c0, true);
     } if (rf & 2) {
@@ -525,7 +543,7 @@ GameComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComp
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtextInterpolate1"]("Opponent : ", ctx.opponentName, " ");
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](7);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("disabled", !ctx.turnBool || !ctx.clickedSpot || ctx.gameEnd);
-    } }, directives: [_angular_common__WEBPACK_IMPORTED_MODULE_8__["NgClass"], _angular_material_button__WEBPACK_IMPORTED_MODULE_9__["MatButton"]], styles: ["main[_ngcontent-%COMP%] {\n    display: flex;\n    flex-direction: column;\n}\n\n#canvasContainer[_ngcontent-%COMP%]  {\n    display: flex;\n    justify-content: center;\n    height: 80%;\n}\n\n#buttons[_ngcontent-%COMP%] {\n    display: flex;\n    justify-content: space-evenly;\n    height: 20%;\n}\n\nbutton[_ngcontent-%COMP%] {\n    margin: auto;\n}\n\n#banner[_ngcontent-%COMP%] {\n    display: flex;\n    justify-content: space-around;\n}\n\n#banner[_ngcontent-%COMP%]   h6[_ngcontent-%COMP%] {\n    margin: auto;\n}\n\n.turn[_ngcontent-%COMP%] {\n    border: 3px solid blue;\n}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9hcHAvZ2FtZS9nYW1lLmNvbXBvbmVudC5jc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7SUFDSSxhQUFhO0lBQ2Isc0JBQXNCO0FBQzFCOztBQUVBO0lBQ0ksYUFBYTtJQUNiLHVCQUF1QjtJQUN2QixXQUFXO0FBQ2Y7O0FBRUE7SUFDSSxhQUFhO0lBQ2IsNkJBQTZCO0lBQzdCLFdBQVc7QUFDZjs7QUFFQTtJQUNJLFlBQVk7QUFDaEI7O0FBRUE7SUFDSSxhQUFhO0lBQ2IsNkJBQTZCO0FBQ2pDOztBQUVBO0lBQ0ksWUFBWTtBQUNoQjs7QUFFQTtJQUNJLHNCQUFzQjtBQUMxQiIsImZpbGUiOiJzcmMvYXBwL2dhbWUvZ2FtZS5jb21wb25lbnQuY3NzIiwic291cmNlc0NvbnRlbnQiOlsibWFpbiB7XG4gICAgZGlzcGxheTogZmxleDtcbiAgICBmbGV4LWRpcmVjdGlvbjogY29sdW1uO1xufVxuXG4jY2FudmFzQ29udGFpbmVyICB7XG4gICAgZGlzcGxheTogZmxleDtcbiAgICBqdXN0aWZ5LWNvbnRlbnQ6IGNlbnRlcjtcbiAgICBoZWlnaHQ6IDgwJTtcbn1cblxuI2J1dHRvbnMge1xuICAgIGRpc3BsYXk6IGZsZXg7XG4gICAganVzdGlmeS1jb250ZW50OiBzcGFjZS1ldmVubHk7XG4gICAgaGVpZ2h0OiAyMCU7XG59XG5cbmJ1dHRvbiB7XG4gICAgbWFyZ2luOiBhdXRvO1xufVxuXG4jYmFubmVyIHtcbiAgICBkaXNwbGF5OiBmbGV4O1xuICAgIGp1c3RpZnktY29udGVudDogc3BhY2UtYXJvdW5kO1xufVxuXG4jYmFubmVyIGg2IHtcbiAgICBtYXJnaW46IGF1dG87XG59XG5cbi50dXJuIHtcbiAgICBib3JkZXI6IDNweCBzb2xpZCBibHVlO1xufSJdfQ== */"] });
+    } }, directives: [_angular_common__WEBPACK_IMPORTED_MODULE_9__["NgClass"], _angular_material_button__WEBPACK_IMPORTED_MODULE_10__["MatButton"]], styles: ["main[_ngcontent-%COMP%] {\n    display: flex;\n    flex-direction: column;\n}\n\n#canvasContainer[_ngcontent-%COMP%]  {\n    display: flex;\n    justify-content: center;\n    height: 80%;\n}\n\n#buttons[_ngcontent-%COMP%] {\n    display: flex;\n    justify-content: space-evenly;\n    height: 20%;\n}\n\nbutton[_ngcontent-%COMP%] {\n    margin: auto;\n}\n\n#banner[_ngcontent-%COMP%] {\n    display: flex;\n    justify-content: space-around;\n}\n\n#banner[_ngcontent-%COMP%]   h6[_ngcontent-%COMP%] {\n    margin: auto;\n}\n\n.turn[_ngcontent-%COMP%] {\n    border: 3px solid blue;\n}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9hcHAvZ2FtZS9nYW1lLmNvbXBvbmVudC5jc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7SUFDSSxhQUFhO0lBQ2Isc0JBQXNCO0FBQzFCOztBQUVBO0lBQ0ksYUFBYTtJQUNiLHVCQUF1QjtJQUN2QixXQUFXO0FBQ2Y7O0FBRUE7SUFDSSxhQUFhO0lBQ2IsNkJBQTZCO0lBQzdCLFdBQVc7QUFDZjs7QUFFQTtJQUNJLFlBQVk7QUFDaEI7O0FBRUE7SUFDSSxhQUFhO0lBQ2IsNkJBQTZCO0FBQ2pDOztBQUVBO0lBQ0ksWUFBWTtBQUNoQjs7QUFFQTtJQUNJLHNCQUFzQjtBQUMxQiIsImZpbGUiOiJzcmMvYXBwL2dhbWUvZ2FtZS5jb21wb25lbnQuY3NzIiwic291cmNlc0NvbnRlbnQiOlsibWFpbiB7XG4gICAgZGlzcGxheTogZmxleDtcbiAgICBmbGV4LWRpcmVjdGlvbjogY29sdW1uO1xufVxuXG4jY2FudmFzQ29udGFpbmVyICB7XG4gICAgZGlzcGxheTogZmxleDtcbiAgICBqdXN0aWZ5LWNvbnRlbnQ6IGNlbnRlcjtcbiAgICBoZWlnaHQ6IDgwJTtcbn1cblxuI2J1dHRvbnMge1xuICAgIGRpc3BsYXk6IGZsZXg7XG4gICAganVzdGlmeS1jb250ZW50OiBzcGFjZS1ldmVubHk7XG4gICAgaGVpZ2h0OiAyMCU7XG59XG5cbmJ1dHRvbiB7XG4gICAgbWFyZ2luOiBhdXRvO1xufVxuXG4jYmFubmVyIHtcbiAgICBkaXNwbGF5OiBmbGV4O1xuICAgIGp1c3RpZnktY29udGVudDogc3BhY2UtYXJvdW5kO1xufVxuXG4jYmFubmVyIGg2IHtcbiAgICBtYXJnaW46IGF1dG87XG59XG5cbi50dXJuIHtcbiAgICBib3JkZXI6IDNweCBzb2xpZCBibHVlO1xufSJdfQ== */"] });
 /*@__PURE__*/ (function () { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"](GameComponent, [{
         type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"],
         args: [{
@@ -533,7 +551,7 @@ GameComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComp
                 templateUrl: './game.component.html',
                 styleUrls: ['./game.component.css']
             }]
-    }], function () { return [{ type: _shared_game_manager_service__WEBPACK_IMPORTED_MODULE_5__["GameManagerService"] }, { type: _angular_material_dialog__WEBPACK_IMPORTED_MODULE_6__["MatDialog"] }, { type: _angular_router__WEBPACK_IMPORTED_MODULE_7__["Router"] }]; }, { canvasElRef: [{
+    }], function () { return [{ type: _shared_game_manager_service__WEBPACK_IMPORTED_MODULE_5__["GameManagerService"] }, { type: _shared_backend_service__WEBPACK_IMPORTED_MODULE_6__["BackendService"] }, { type: _angular_material_dialog__WEBPACK_IMPORTED_MODULE_7__["MatDialog"] }, { type: _angular_router__WEBPACK_IMPORTED_MODULE_8__["Router"] }]; }, { canvasElRef: [{
             type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["ViewChild"],
             args: ['canvas', { static: false }]
         }], onResize: [{
@@ -916,7 +934,7 @@ class JoinGameComponent {
     }
     ngOnInit() {
         console.log(this.gameInfo);
-        this.backendSubscription = this.backendManager.backendSubject.subscribe((brResponse) => {
+        this.backendSubscription = this.backendManager.getBackEndSubject().subscribe((brResponse) => {
             if (brResponse.extra === "gameFound:Waiting") {
                 this.gameManager.setGameInfo(this.gameInfo);
             }
@@ -1084,13 +1102,17 @@ class LobbyComponent {
                 this.dialogRef.close();
                 this.dialogRef = null;
             }
+            if (gameInfo.gameName === null) {
+                return;
+            }
             if (gameInfo.opponentPC) {
                 this.router.navigate(['/game']);
             }
             if (gameInfo.playersReady) {
+                clearInterval(this.checkDataBase);
                 this.router.navigate(['/game']);
             }
-            else {
+            else if (!gameInfo.playersReady) {
                 if (gameInfo.hostName === this.gameManager.playerName) {
                     this.dialogRef = this.dialog.open(_waiting_waiting_component__WEBPACK_IMPORTED_MODULE_5__["WaitingComponent"], { data: { message: "Waiting for client to join.", isHost: true } });
                 }
@@ -1099,7 +1121,7 @@ class LobbyComponent {
                 }
             }
         });
-        this.backendSubscription = this.databaseManager.backendSubject.subscribe(brResponse => {
+        this.backendSubscription = this.databaseManager.getBackEndSubject().subscribe(brResponse => {
             if (brResponse.extra === "logoutUser") {
                 this.router.navigate(["/title"]);
             }
@@ -1110,17 +1132,16 @@ class LobbyComponent {
             }
             else if (brResponse.extra === "gameDeleted") {
                 clearInterval(this.checkDataBase);
+                this.gameManager.clearGameInfo();
                 this.setGameList(brResponse);
                 this.startDBQueryInterval();
             }
         });
-        this.databaseManager.fetchGameList();
         this.startDBQueryInterval();
     }
     ngOnDestroy() {
         this.gameInfoSubscription.unsubscribe();
         this.backendSubscription.unsubscribe();
-        clearInterval(this.checkDataBase);
     }
     onExit() {
         this.databaseManager.logOut();
@@ -1133,6 +1154,9 @@ class LobbyComponent {
         this.dialogRef = this.dialog.open(_against_pc_against_pc_component__WEBPACK_IMPORTED_MODULE_4__["AgainstPcComponent"]);
     }
     onClickRow(row) {
+        if (row.inSession) {
+            return;
+        }
         this.dialogRef = this.dialog.open(_join_game_join_game_component__WEBPACK_IMPORTED_MODULE_3__["JoinGameComponent"], { data: row });
     }
     getUserName() {
@@ -1253,21 +1277,32 @@ function WaitingComponent_app_loading_7_Template(rf, ctx) { if (rf & 1) {
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](0, "app-loading");
 } }
 function WaitingComponent_div_8_Template(rf, ctx) { if (rf & 1) {
+    const _r5 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵgetCurrentView"]();
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "div");
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](1, "button", 4);
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](2, "Back");
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵlistener"]("click", function WaitingComponent_div_8_Template_button_click_1_listener() { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵrestoreView"](_r5); const ctx_r4 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](); return ctx_r4.toLobby(); });
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](2, "To Lobby");
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
 } }
 function WaitingComponent_div_9_Template(rf, ctx) { if (rf & 1) {
-    const _r4 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵgetCurrentView"]();
+    const _r7 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵgetCurrentView"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "div");
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](1, "button", 4);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵlistener"]("click", function WaitingComponent_div_9_Template_button_click_1_listener() { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵrestoreView"](_r7); const ctx_r6 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](); return ctx_r6.onDenied(); });
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](2, "Okay");
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+} }
+function WaitingComponent_div_10_Template(rf, ctx) { if (rf & 1) {
+    const _r9 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵgetCurrentView"]();
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "div", 5);
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](1, "button", 6);
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵlistener"]("click", function WaitingComponent_div_9_Template_button_click_1_listener() { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵrestoreView"](_r4); const ctx_r3 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](); return ctx_r3.no(); });
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](1, "button", 4);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵlistener"]("click", function WaitingComponent_div_10_Template_button_click_1_listener() { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵrestoreView"](_r9); const ctx_r8 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](); return ctx_r8.no(); });
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](2, "No");
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](3, "button", 7);
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵlistener"]("click", function WaitingComponent_div_9_Template_button_click_3_listener() { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵrestoreView"](_r4); const ctx_r5 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](); return ctx_r5.yes(); });
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](3, "button", 6);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵlistener"]("click", function WaitingComponent_div_10_Template_button_click_3_listener() { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵrestoreView"](_r9); const ctx_r10 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](); return ctx_r10.yes(); });
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](4, "Yes");
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
@@ -1278,40 +1313,57 @@ class WaitingComponent {
         this.backendManager = backendManager;
         this.gameManager = gameManager;
         this.confirm = false;
+        this.denied = false;
     }
     ngOnInit() {
         this.gInfo = this.gameManager.getGameInfo();
-        this.backendSubscription = this.backendManager.backendSubject.subscribe(response => {
+        this.gInfo.inSession = true;
+        this.backendSubscription = this.backendManager.getBackEndSubject().subscribe(response => {
             if (response.extra === "gameJoin") {
                 this.data.message = "Joining game!";
                 this.clearDBInterval();
                 this.gameManager.joinGame(this.gInfo);
             }
             else if (response.extra === "hostDenied") {
+                this.confirm = true;
+                this.denied = true;
                 this.data.message = "Host denied";
             }
-            else if (response.extra === "waitingOnHost") {
+            else if (response.extra === "waitingOnHost" && !this.denied) {
                 this.data.message = "Waiting for host's response.";
             }
-            else if (response.extra === "cancelWaiting") {
-                this.data.message = "Client left";
-            }
             else if (response.extra === "waitingForClient") {
+                this.confirm = false;
                 this.data.message = "Waiting for client to join...";
             }
             else if (response.extra === "clientIsWaiting") {
-                this.data.message = response.extra.client + " would like to play.";
-                this.clientName = response.extra.client;
+                this.data.message = response.client + " would like to play.";
+                this.clientName = response.client;
                 this.confirm = true;
             }
+            else if (response.extra === "gameCancelled") {
+                this.backendManager.deleteGame(this.gInfo);
+            }
+            else if (response.extra === "clientLeft") {
+                this.gameManager.clearGameInfo();
+            }
         });
-        this.backendManager.check(this.gInfo, this.gInfo.userId, this.data.isHost);
         this.startDBQueryInterval(this.data.isHost);
     }
     ngOnDestroy() {
-        this.backendManager.deleteGame(this.gInfo);
+        //this.backendManager.deleteGame(this.gInfo);
         this.backendSubscription.unsubscribe();
         this.clearDBInterval();
+    }
+    toLobby() {
+        this.clearDBInterval();
+        this.gInfo.inSession = false;
+        this.backendManager.cancelWaiting(this.gInfo, this.data.isHost);
+    }
+    onDenied() {
+        this.clearDBInterval();
+        this.gInfo.inSession = false;
+        this.gameManager.clearGameInfo();
     }
     yes() {
         this.clearDBInterval();
@@ -1322,6 +1374,10 @@ class WaitingComponent {
         this.backendManager.confirmClient(this.gInfo, this.gInfo.userId);
     }
     no() {
+        this.clearDBInterval();
+        this.confirm = false;
+        this.backendManager.denyClient(this.gInfo, this.gInfo.userId);
+        this.startDBQueryInterval(this.data.isHost);
     }
     startDBQueryInterval(isHost) {
         this.checkDataBase = setInterval(() => {
@@ -1335,7 +1391,7 @@ class WaitingComponent {
     }
 }
 WaitingComponent.ɵfac = function WaitingComponent_Factory(t) { return new (t || WaitingComponent)(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_angular_material_dialog__WEBPACK_IMPORTED_MODULE_1__["MAT_DIALOG_DATA"]), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](src_app_shared_backend_service__WEBPACK_IMPORTED_MODULE_2__["BackendService"]), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](src_app_shared_game_manager_service__WEBPACK_IMPORTED_MODULE_3__["GameManagerService"])); };
-WaitingComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"]({ type: WaitingComponent, selectors: [["app-waiting"]], decls: 10, vars: 4, consts: [["mat-dialog-title", ""], ["id", "spinner"], [4, "ngIf"], ["id", "confirm", 4, "ngIf"], ["mat-flat-button", "", "mat-dialog-close", "", "color", "accent", "type", "button"], ["id", "confirm"], ["mat-flat-button", "", "color", "accent", "type", "button", 3, "click"], ["mat-flat-button", "", "color", "primary", "type", "button", 3, "click"]], template: function WaitingComponent_Template(rf, ctx) { if (rf & 1) {
+WaitingComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"]({ type: WaitingComponent, selectors: [["app-waiting"]], decls: 11, vars: 5, consts: [["mat-dialog-title", ""], ["id", "spinner"], [4, "ngIf"], ["id", "confirm", 4, "ngIf"], ["mat-flat-button", "", "color", "accent", "type", "button", 3, "click"], ["id", "confirm"], ["mat-flat-button", "", "color", "primary", "type", "button", 3, "click"]], template: function WaitingComponent_Template(rf, ctx) { if (rf & 1) {
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "h4", 0);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](1, " Waiting ");
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
@@ -1349,7 +1405,8 @@ WaitingComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineC
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](7, WaitingComponent_app_loading_7_Template, 1, 0, "app-loading", 2);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](8, WaitingComponent_div_8_Template, 3, 0, "div", 2);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](9, WaitingComponent_div_9_Template, 5, 0, "div", 3);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](9, WaitingComponent_div_9_Template, 3, 0, "div", 2);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](10, WaitingComponent_div_10_Template, 5, 0, "div", 3);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
     } if (rf & 2) {
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](5);
@@ -1357,10 +1414,12 @@ WaitingComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineC
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](2);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", !ctx.confirm);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", !ctx.confirm);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", !ctx.confirm && !ctx.denied);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx.confirm);
-    } }, directives: [_angular_material_dialog__WEBPACK_IMPORTED_MODULE_1__["MatDialogTitle"], _angular_common__WEBPACK_IMPORTED_MODULE_4__["NgIf"], _shared_loading_loading_component__WEBPACK_IMPORTED_MODULE_5__["LoadingComponent"], _angular_material_button__WEBPACK_IMPORTED_MODULE_6__["MatButton"], _angular_material_dialog__WEBPACK_IMPORTED_MODULE_1__["MatDialogClose"]], styles: ["main[_ngcontent-%COMP%] {\n    display: flex;\n    flex-direction: column;\n}\n\n#spinner[_ngcontent-%COMP%] {\n    width: 50%;\n    height: 50%;\n    \n}\n\n#confirm[_ngcontent-%COMP%] {\n    display: flex;\n    justify-content: space-evenly;\n}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9hcHAvbG9iYnkvd2FpdGluZy93YWl0aW5nLmNvbXBvbmVudC5jc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7SUFDSSxhQUFhO0lBQ2Isc0JBQXNCO0FBQzFCOztBQUVBO0lBQ0ksVUFBVTtJQUNWLFdBQVc7O0FBRWY7O0FBRUE7SUFDSSxhQUFhO0lBQ2IsNkJBQTZCO0FBQ2pDIiwiZmlsZSI6InNyYy9hcHAvbG9iYnkvd2FpdGluZy93YWl0aW5nLmNvbXBvbmVudC5jc3MiLCJzb3VyY2VzQ29udGVudCI6WyJtYWluIHtcbiAgICBkaXNwbGF5OiBmbGV4O1xuICAgIGZsZXgtZGlyZWN0aW9uOiBjb2x1bW47XG59XG5cbiNzcGlubmVyIHtcbiAgICB3aWR0aDogNTAlO1xuICAgIGhlaWdodDogNTAlO1xuICAgIFxufVxuXG4jY29uZmlybSB7XG4gICAgZGlzcGxheTogZmxleDtcbiAgICBqdXN0aWZ5LWNvbnRlbnQ6IHNwYWNlLWV2ZW5seTtcbn0iXX0= */"] });
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx.denied);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx.confirm && !ctx.denied);
+    } }, directives: [_angular_material_dialog__WEBPACK_IMPORTED_MODULE_1__["MatDialogTitle"], _angular_common__WEBPACK_IMPORTED_MODULE_4__["NgIf"], _shared_loading_loading_component__WEBPACK_IMPORTED_MODULE_5__["LoadingComponent"], _angular_material_button__WEBPACK_IMPORTED_MODULE_6__["MatButton"]], styles: ["main[_ngcontent-%COMP%] {\n    display: flex;\n    flex-direction: column;\n}\n\n#spinner[_ngcontent-%COMP%] {\n    width: 50%;\n    height: 50%;\n    \n}\n\n#confirm[_ngcontent-%COMP%] {\n    display: flex;\n    justify-content: space-evenly;\n}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9hcHAvbG9iYnkvd2FpdGluZy93YWl0aW5nLmNvbXBvbmVudC5jc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7SUFDSSxhQUFhO0lBQ2Isc0JBQXNCO0FBQzFCOztBQUVBO0lBQ0ksVUFBVTtJQUNWLFdBQVc7O0FBRWY7O0FBRUE7SUFDSSxhQUFhO0lBQ2IsNkJBQTZCO0FBQ2pDIiwiZmlsZSI6InNyYy9hcHAvbG9iYnkvd2FpdGluZy93YWl0aW5nLmNvbXBvbmVudC5jc3MiLCJzb3VyY2VzQ29udGVudCI6WyJtYWluIHtcbiAgICBkaXNwbGF5OiBmbGV4O1xuICAgIGZsZXgtZGlyZWN0aW9uOiBjb2x1bW47XG59XG5cbiNzcGlubmVyIHtcbiAgICB3aWR0aDogNTAlO1xuICAgIGhlaWdodDogNTAlO1xuICAgIFxufVxuXG4jY29uZmlybSB7XG4gICAgZGlzcGxheTogZmxleDtcbiAgICBqdXN0aWZ5LWNvbnRlbnQ6IHNwYWNlLWV2ZW5seTtcbn0iXX0= */"] });
 /*@__PURE__*/ (function () { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"](WaitingComponent, [{
         type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"],
         args: [{
@@ -1513,6 +1572,9 @@ class BackendService {
         this.backendSubject = new rxjs__WEBPACK_IMPORTED_MODULE_1__["Subject"]();
         this.BASE_URL = "http://localhost:3000/api/";
     }
+    getBackEndSubject() {
+        return this.backendSubject.asObservable();
+    }
     logIn(username) {
         this.http.post(this.BASE_URL + "user/login", { username: username }).subscribe(response => {
             if (response.status === 201) {
@@ -1556,7 +1618,16 @@ class BackendService {
             this.backendSubject.next(response);
         });
     }
-    cancelWaiting() {
+    cancelWaiting(gInfo, isHost) {
+        this.http.post(this.BASE_URL + "lobby/cancelWaiting", {
+            hostName: gInfo.hostName,
+            hostId: gInfo.userId,
+            gameName: gInfo.gameName,
+            isHost: isHost
+        })
+            .subscribe(response => {
+            this.backendSubject.next(response);
+        });
     }
     confirmClient(gInfo, hostId) {
         this.http.post(this.BASE_URL + "lobby/hostGame/hostConfirm", {
@@ -1569,12 +1640,35 @@ class BackendService {
             this.backendSubject.next(response);
         });
     }
+    denyClient(gInfo, hostId) {
+        this.http.post(this.BASE_URL + "lobby/hostGame/hostDeny", {
+            hostName: gInfo.hostName,
+            hostId: hostId,
+            gameName: gInfo.gameName,
+        })
+            .subscribe(response => {
+            this.backendSubject.next(response);
+        });
+    }
     check(gInfo, hostId, isHost) {
         this.http.post(this.BASE_URL + "lobby/check", {
             hostName: gInfo.hostName,
             hostId: hostId,
             gameName: gInfo.gameName,
             isHost: isHost
+        }).subscribe(response => {
+            this.backendSubject.next(response);
+        });
+    }
+    checkGameState() {
+        this.http.post(this.BASE_URL + "gameplay/check", {});
+    }
+    startGame(gInfo, board) {
+        this.http.post(this.BASE_URL + "gameplay/startGame", {
+            gameMode: gInfo.gameType,
+            hostName: gInfo.hostName,
+            clientName: gInfo.opponentName,
+            board: board.boardArray
         }).subscribe(response => {
             this.backendSubject.next(response);
         });
@@ -1937,11 +2031,13 @@ class GameManagerService {
     startGame(canvas) {
         this.gameEnd = false;
         const ginfo = this.gameInfo;
-        this.computerPiece = Math.floor(Math.random() * 2) === 0 ? "o" : "x";
         if (ginfo.opponentPC) {
             this.pc = new _player_player__WEBPACK_IMPORTED_MODULE_4__["ComputerPlayer"](this.computerPiece, false, ginfo.difficulty, this);
+            this.computerPiece = Math.floor(Math.random() * 2) === 0 ? "o" : "x";
             let playerPiece = this.computerPiece === "x" ? "o" : "x";
             this.computerPieceSubject.next(playerPiece);
+            this.turn = Math.floor(Math.random() * 2) === 0 ? "o" : "x";
+            this.playerTurnSubject.next(this.turn);
         }
         if (ginfo.gameType === "TTT") {
             this.board = new _board_ttt_board__WEBPACK_IMPORTED_MODULE_2__["TicTacToeBoard"](canvas);
@@ -1949,8 +2045,6 @@ class GameManagerService {
         else if (ginfo.gameType === "CF") {
             this.board = new _board_cf_board__WEBPACK_IMPORTED_MODULE_3__["ConnectFourBoard"](canvas);
         }
-        this.turn = Math.floor(Math.random() * 2) === 0 ? "o" : "x";
-        this.playerTurnSubject.next(this.turn);
     }
     endGame(check) {
         this.gameEnd = true;
@@ -1992,7 +2086,7 @@ class GameManagerService {
         return this.gameInfo;
     }
     clearGameInfo() {
-        this.gameInfo = null;
+        this.gameInfo = { gameName: null, gameType: null, opponentPC: null, hostName: null };
         this.gameInfoSubject.next(this.gameInfo);
     }
 }

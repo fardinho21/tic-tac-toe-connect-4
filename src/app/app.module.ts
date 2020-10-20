@@ -54,8 +54,21 @@ declare global {
     error?:  string,
     extra?: any,
     gameList?: any,
-    move?: number[],
-    gameEnd?: boolean
+    gameState: any
+  }
+  export interface GameState {
+    gameMode: string,
+    turn: string,
+    hostPiece: string,
+    clientPiece: string,
+    hostName: string,
+    clientName: string,
+    gameOver: boolean,
+    clientLeft: boolean,
+    hostLeft: boolean,
+    winner: string,
+    lastUpdatedPiece: BoardPiece,
+    board: Array<BoardPiece[]>
   }
 }
 

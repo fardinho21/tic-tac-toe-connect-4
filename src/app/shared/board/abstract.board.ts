@@ -85,6 +85,10 @@ export abstract class Board {
         this.emptyBoard();
         this.drawBoard();
     }
+
+    setBoardArrayFromGameState(gameState: GameState) {
+        
+    }
     
     setCanvasDimensions(width=this.canvas.width, height=this.canvas.height) {
         this.canvas.width = width;

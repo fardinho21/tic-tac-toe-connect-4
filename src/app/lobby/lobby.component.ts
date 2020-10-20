@@ -58,7 +58,7 @@ export class LobbyComponent implements OnInit, OnDestroy {
       if (gameInfo.playersReady) {
         clearInterval(this.checkDataBase);
         this.router.navigate(['/game'])
-      } else if (!gameInfo.playersReady) {
+      } else if (!gameInfo.playersReady && !gameInfo.opponentPC) {
         if (gameInfo.hostName === this.gameManager.playerName) {
           this.dialogRef = this.dialog.open(WaitingComponent, {data :  {message: "Waiting for client to join.", isHost: true}})
         } else {
@@ -92,7 +92,6 @@ export class LobbyComponent implements OnInit, OnDestroy {
   }
 
   onExit() {
-
     this.databaseManager.logOut();
   }
 
