@@ -20,7 +20,7 @@ export class GameEndComponent implements OnInit {
     } else if (this.data.piece === this.data.result) {
       this.message = "You win!"
       this.header = "Chicken Dinner"
-    } else if (this.data.piece != this.data.piece) {
+    } else if (this.data.result != "draw" && this.data.result != this.data.piece){
       this.message = "You lose!"
       this.header = "Too Bad"
     }

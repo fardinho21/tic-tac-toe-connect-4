@@ -1,4 +1,3 @@
-import { ThrowStmt } from '@angular/compiler';
 import { Subject } from "rxjs";
 
 export abstract class Board {
@@ -28,7 +27,7 @@ export abstract class Board {
     abstract clickBoard(x:number,y:number):BoardPiece;
     abstract getBoardPiece(r:number,c:number):BoardPiece;
     abstract drawBoard();
-    abstract print();
+    abstract printBoard();
     abstract drawPieces();
 
     clearBoard() {
@@ -85,6 +84,10 @@ export abstract class Board {
     resetBoard() {
         this.emptyBoard();
         this.drawBoard();
+    }
+
+    setBoardArrayFromGameState(gameState: GameState) {
+        
     }
     
     setCanvasDimensions(width=this.canvas.width, height=this.canvas.height) {

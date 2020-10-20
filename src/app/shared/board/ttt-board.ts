@@ -1,5 +1,3 @@
-import { throwMatDialogContentAlreadyAttachedError } from '@angular/material/dialog';
-import { ɵangular_packages_platform_browser_dynamic_platform_browser_dynamic_a } from '@angular/platform-browser-dynamic';
 import { Board } from "./abstract.board";
 
 export class TicTacToeBoard extends Board{
@@ -14,11 +12,11 @@ export class TicTacToeBoard extends Board{
 
     checkForWinner() : string {
 
-        let checkDiag1 = this.boardArray[0][0].piece === this.boardArray[1][1].piece && 
-                         this.boardArray[1][1].piece === this.boardArray[2][2].piece;
-        let checkDiag2 = this.boardArray[2][0].piece === this.boardArray[1][1].piece &&
-                         this.boardArray[1][1].piece === this.boardArray[0][2].piece
-
+        const checkDiag1 = this.boardArray[0][0].piece === this.boardArray[1][1].piece &&
+                           this.boardArray[1][1].piece === this.boardArray[2][2].piece
+        const checkDiag2 = this.boardArray[2][0].piece === this.boardArray[1][1].piece &&
+                           this.boardArray[1][1].piece === this.boardArray[0][2].piece
+        
         if (checkDiag1){
             return this.boardArray[0][0].piece
         } else if (checkDiag2) {
@@ -177,7 +175,7 @@ export class TicTacToeBoard extends Board{
         }).join("")
     }
 
-    print() {
+    printBoard() {
         let str = []
         for (let r = 0; r < 3; r++) {
             let rowStr = this.boardArray[r].map( (bp : BoardPiece) => {

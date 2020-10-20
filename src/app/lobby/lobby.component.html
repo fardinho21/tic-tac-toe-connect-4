@@ -41,7 +41,7 @@
     <section id="form">
         <!-- form controls -->
         <div>
-            <button mat-flat-button color="accent" type="button" routerLink="/">Exit</button>
+            <button mat-flat-button color="accent" type="button" (click)="onExit()">Exit</button>
             <button mat-flat-button color="secondary" style="border: 1px grey inset;" type="button" (click)="onAgainstPC()">Against PC</button>
             <button mat-raised-button color="primary" type="button" (click)="onHostGame()">Host Game</button>
         </div>

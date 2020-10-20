@@ -30,7 +30,7 @@ export class ConnectFourBoard extends Board{
         return ""
     }
 
-    print() {
+    printBoard() {
         return []
     }
 }

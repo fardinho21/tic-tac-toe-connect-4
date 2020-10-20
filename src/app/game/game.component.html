@@ -1,10 +1,15 @@
 
 <main>
 
-    <div id="banner">
-        <h6 [ngClass]="{turn : turnBool === true}">Host : {{hostName}}</h6>
+    <div id="banner" *ngIf="!gInfo.opponentPC">
+        <h6 [ngClass]="{turn : gameState && gameState.hostPiece === gameState.turn}">Host : {{hostName}}</h6>
+        <h6 [ngClass]="{turn : gameState && gameState.clientPiece === gameState.turn }">Opponent : {{opponentName}} </h6>
+    </div>
+    <div id="banner" *ngIf="gInfo.opponentPC">
+        <h6 [ngClass]="{turn : turnBool === true }">Host : {{hostName}}</h6>
         <h6 [ngClass]="{turn : turnBool === false }">Opponent : {{opponentName}} </h6>
     </div>
+
 
     <section id="canvasContainer">
         <canvas #canvas style="border: 5px inset indigo;" (click)="onCanvasClick($event)">

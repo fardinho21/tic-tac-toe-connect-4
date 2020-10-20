@@ -21,6 +21,8 @@ import { ConfirmMoveComponent } from "./game/confirm-move/confirm-move.component
 import { GameComponent } from "./game/game.component";
 import { GameEndComponent } from './game/game-end/game-end.component';
 
+import { HttpClientModule } from "@angular/common/http";
+import { GameManagerService } from './shared/game-manager.service';
 
 declare global {
   export interface GameInfo {
@@ -28,14 +30,45 @@ declare global {
     gameType: string;
     gameName: string;
     opponentPC: boolean;
+    inSession?: boolean;
+    userId?: string;
+    playersReady?: boolean;
     opponentName?: string;
     host?: boolean;
     difficulty? : string;
+
   }
   export interface BoardPiece {
     index: number[];
     set : boolean;
     piece: string;
+  }
+
+  export interface BackendResponse {
+    message: string,
+    status: number,
+    username?: string,
+    client?: string,
+    userId?: string,
+    token?: any,
+    error?:  string,
+    extra?: any,
+    gameList?: any,
+    gameState: any
+  }
+  export interface GameState {
+    gameMode: string,
+    turn: string,
+    hostPiece: string,
+    clientPiece: string,
+    hostName: string,
+    clientName: string,
+    gameOver: boolean,
+    clientLeft: boolean,
+    hostLeft: boolean,
+    winner: string,
+    lastUpdatedPiece: BoardPiece,
+    board: Array<BoardPiece[]>
   }
 }
 
@@ -60,9 +93,10 @@ declare global {
     BrowserAnimationsModule,
     FormsModule,
     RoutingModule,
-    MaterialModule
+    MaterialModule,
+    HttpClientModule
   ],
-  providers: [],
+  providers: [GameManagerService],
   bootstrap: [AppComponent],
   entryComponents: [
     HostGameComponent, 
