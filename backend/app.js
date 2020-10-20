@@ -4,6 +4,8 @@ const mongoose = require("mongoose");
 const express = require("express");
 const bodyParser = require("body-parser");
 const usersRoutes = require("./routes/users");
+const gameplayRoutes = require("./routes/gameplay")
+const lobbyRoutes = require("./routes/lobby")
 const app = express();
 
 mongoose.connect("mongodb+srv://fardinho:123asd@cluster0.oqizr.mongodb.net/TTTC4db?retryWrites=true&w=majority")
@@ -31,6 +33,8 @@ app.use((req, res, next) => {
 });
 
 //App
-app.use("/api/login", usersRoutes);
+app.use("/api/user", usersRoutes);
+app.use("/api/lobby", lobbyRoutes);
+app.use("/api/gameplay", gameplayRoutes);
 
 module.exports = app;

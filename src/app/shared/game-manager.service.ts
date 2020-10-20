@@ -33,34 +33,46 @@ export class GameManagerService {
     this.setGameInfo(gameInfo)
   }
 
+  
   joinGame(gameInfo : GameInfo) {
+    gameInfo.playersReady = true;
+    if (gameInfo.hostName != this.playerName) {
+      gameInfo.opponentName = this.playerName
+    }
     this.setGameInfo(gameInfo)
   }
 
   quitGame() {
     
-    this.clearGameInfo();
-    this.board.clearBoard();
-    this.board.emptyBoard();
-    this.pc.quitGame();
+    if (this.board) {
+      this.board.clearBoard();
+      this.board.emptyBoard();
+    }
+
+    if (this.pc) {
+      this.pc.quitGame();
+      this.pc = null;
+    }
     this.gameEnd = false;
     this.board = null;
-    this.pc = null;
     this.computerPiece = "";
     this.turn = "";
+    this.clearGameInfo();
+
   }
 
   startGame(canvas : HTMLCanvasElement) {
     this.gameEnd = false;
     const ginfo = this.gameInfo;
 
-    this.computerPiece = Math.floor(Math.random()*2) === 0 ? "o" : "x";
-    
     if (ginfo.opponentPC) {
       this.pc = new ComputerPlayer(this.computerPiece,false,ginfo.difficulty,this);
+      this.computerPiece = Math.floor(Math.random()*2) === 0 ? "o" : "x";
       let playerPiece = this.computerPiece === "x" ? "o" : "x";
       this.computerPieceSubject.next(playerPiece);
-    }
+      this.turn = Math.floor(Math.random()*2) === 0 ? "o" : "x"
+      this.playerTurnSubject.next(this.turn);
+    } 
 
     if (ginfo.gameType === "TTT") {
       this.board = new TicTacToeBoard(canvas);
@@ -68,14 +80,18 @@ export class GameManagerService {
       this.board = new ConnectFourBoard(canvas);
     }
     
-    this.turn = Math.floor(Math.random()*2) === 0 ? "o" : "x"
-    this.playerTurnSubject.next(this.turn);
+
   }
 
   endGame(check : string) {
-    this.gameEnd = true;
-    this.board.drawBoardAndPieces();
-    this.gameEndSubject.next(check)
+    try {
+      this.gameEnd = true;
+      this.board.drawBoardAndPieces();
+      this.gameEndSubject.next(check)
+    } catch (err) {
+      console.log(err)
+    }
+
   }
 
   confirmMove(move : number[], piece: string) {
@@ -120,8 +136,8 @@ export class GameManagerService {
   }
 
   clearGameInfo() {
-    this.gameInfo = null;
+    this.gameInfo = {gameName: null, gameType: null, opponentPC: null, hostName: null}
     this.gameInfoSubject.next(this.gameInfo);
   }
-  
+
 }

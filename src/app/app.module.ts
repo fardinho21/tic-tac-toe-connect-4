@@ -30,6 +30,7 @@ declare global {
     gameType: string;
     gameName: string;
     opponentPC: boolean;
+    inSession?: boolean;
     userId?: string;
     playersReady?: boolean;
     opponentName?: string;
@@ -47,13 +48,27 @@ declare global {
     message: string,
     status: number,
     username?: string,
+    client?: string,
     userId?: string,
     token?: any,
     error?:  string,
     extra?: any,
     gameList?: any,
-    move?: number[],
-    gameEnd?: boolean
+    gameState: any
+  }
+  export interface GameState {
+    gameMode: string,
+    turn: string,
+    hostPiece: string,
+    clientPiece: string,
+    hostName: string,
+    clientName: string,
+    gameOver: boolean,
+    clientLeft: boolean,
+    hostLeft: boolean,
+    winner: string,
+    lastUpdatedPiece: BoardPiece,
+    board: Array<BoardPiece[]>
   }
 }
 

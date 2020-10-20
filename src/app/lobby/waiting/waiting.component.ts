@@ -16,6 +16,7 @@ export class WaitingComponent implements OnInit, OnDestroy {
   backendSubscription : Subscription;
   gInfo : GameInfo;
   confirm : boolean = false;
+  denied : boolean = false;
   clientName : string;
 
   constructor(
@@ -25,23 +26,30 @@ export class WaitingComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.gInfo = this.gameManager.getGameInfo();
+    this.gInfo.inSession = true;
 
-    this.backendSubscription = this.backendManager.backendSubject.subscribe(response => {
+    this.backendSubscription = this.backendManager.getBackEndSubject().subscribe(response => {
       if (response.extra === "gameJoin") {
         this.data.message = "Joining game!"
+        this.clearDBInterval();
         this.gameManager.joinGame(this.gInfo);
       } else if (response.extra === "hostDenied") {
-        this.data.message = "Host denied"
-      } else if (response.extra === "waitingOnHostResponse") {
-        this.data.message = "Waiting for host's response."
-      } else if (response.extra === "cancelWaiting") {
-        this.data.message = "Client left"
-      } else if (response.extra === "waitingForClient") {
-        this.data.message = "Waiting for client to join..."
-      } else if (response.extra.message === "clientIsWaiting") {
-        this.data.message = response.extra.client + " would like to play."
-        this.clientName = response.extra.client;
         this.confirm = true;
+        this.denied = true;
+        this.data.message = "Host denied";
+      } else if (response.extra === "waitingOnHost" && !this.denied) {
+        this.data.message = "Waiting for host's response."
+      } else if (response.extra === "waitingForClient") {
+        this.confirm = false
+        this.data.message = "Waiting for client to join..."
+      } else if (response.extra === "clientIsWaiting") {
+        this.data.message = response.client + " would like to play."
+        this.clientName = response.client;
+        this.confirm = true;
+      } else if (response.extra === "gameCancelled"){
+        this.backendManager.deleteGame(this.gInfo)
+      } else if (response.extra === "clientLeft") {
+        this.gameManager.clearGameInfo();
       }
     })
 
@@ -49,21 +57,37 @@ export class WaitingComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() { 
-    this.backendManager.deleteGame(this.gInfo);
+    //this.backendManager.deleteGame(this.gInfo);
     this.backendSubscription.unsubscribe();
-    clearInterval(this.checkDataBase);
+    this.clearDBInterval();
+  }
+
+  toLobby() {
+    this.clearDBInterval()
+    this.gInfo.inSession = false;
+    this.backendManager.cancelWaiting(this.gInfo, this.data.isHost)
+  }
+
+  onDenied() {
+    this.clearDBInterval()
+    this.gInfo.inSession = false;
+    this.gameManager.clearGameInfo();
   }
 
   yes() {
-    clearInterval(this.checkDataBase)
+    this.clearDBInterval();
     this.gInfo.opponentName = this.clientName;
     this.gInfo.playersReady = true;
-    this.backendManager.confirmClient(this.gInfo, this.gInfo.userId)
     this.confirm = false;
     this.data.message = "Fetching from database..."
+    this.backendManager.confirmClient(this.gInfo, this.gInfo.userId)
   }
 
   no() {
+    this.clearDBInterval();
+    this.confirm = false;
+    this.backendManager.denyClient(this.gInfo, this.gInfo.userId)
+    this.startDBQueryInterval(this.data.isHost)
 
   }
 
@@ -74,4 +98,9 @@ export class WaitingComponent implements OnInit, OnDestroy {
     }, 1000)
   }
 
+  clearDBInterval() {
+    if (this.checkDataBase) {
+      clearInterval(this.checkDataBase)
+    }
+  }
 }

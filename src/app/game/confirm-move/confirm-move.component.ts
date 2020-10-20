@@ -1,5 +1,6 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { BackendService } from 'src/app/shared/backend.service';
 import { GameManagerService } from "../../shared/game-manager.service";
 
 @Component({
@@ -11,7 +12,8 @@ export class ConfirmMoveComponent implements OnInit {
 
   confirmMoveClicked = false;
 
-  constructor(@Inject(MAT_DIALOG_DATA) public move : any[], private gameManager : GameManagerService) { }
+  constructor(@Inject(MAT_DIALOG_DATA) public data : {move : number[], playerPiece : string, gInfo: GameInfo}, 
+  private gameManager : GameManagerService, private backendManager: BackendService) { }
 
 
   ngOnInit(): void {
@@ -20,7 +22,12 @@ export class ConfirmMoveComponent implements OnInit {
 
   yes() {
     this.confirmMoveClicked = true;
-    this.gameManager.confirmMove(this.move[0],this.move[1]);
+    const gInfo = this.data.gInfo;
+    if (!gInfo.opponentPC) {
+      this.backendManager.confirmMove(gInfo, this.gameManager.playerName === gInfo.hostName, this.data.move)
+    }
+    
+    this.gameManager.confirmMove(this.data.move,this.data.playerPiece);
   }
 
   no() {
