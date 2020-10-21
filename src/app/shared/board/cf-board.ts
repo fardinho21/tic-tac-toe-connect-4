@@ -15,7 +15,7 @@ export class ConnectFourBoard extends Board{
     }
     
     getBoardPiece(r:number,c:number){
-        return {index: [], set: false, piece: ""}
+        return this.boardArray[r][c];
     }
 
     drawBoard() {
@@ -67,7 +67,7 @@ export class ConnectFourBoard extends Board{
                 heightOfOneSpot*0.25,0,0,Math.PI*2
             );
             this.context.fill();
-            
+
             i++;
             if (i > this.lengthOfCol - 1) {
                 i = 0;
@@ -80,11 +80,77 @@ export class ConnectFourBoard extends Board{
     }
 
     drawPieces() {
+        let i = 0;
+        let j = 0;
+
+        const widthOfOneSpot = this.canvas.width/this.lengthOfRow
+        const heightOfOneSpot = this.canvas.height/this.lengthOfCol
+
+
+        while(true) {
+            const piece = this.boardArray[i][j];
+            this.context.beginPath();
+
+            if (piece.piece === "r") {
+                this.context.fillStyle = "#922725";
+            } else if (piece.piece === "y") {
+                this.context.fillStyle = "#CAAB04"
+            } else {
+                this.context.fillStyle = "white"
+            }
+
+            this.context.ellipse(
+                widthOfOneSpot*(j+0.5),
+                heightOfOneSpot*(i+0.5),
+                widthOfOneSpot*0.25,
+                heightOfOneSpot*0.25,0,0,Math.PI*2
+            );
+            this.context.fill();
+
+            i++;
+            if (i > this.lengthOfCol - 1) {
+                i = 0;
+                j++;
+            } 
+            if (j > this.lengthOfRow - 1) {
+                break;
+            }
+
+        }
 
     }
     
-    clickBoard(x:number,y:number) {
-        return {index: [], set: false, piece: ""}
+    clickBoard(x:number,y:number) : BoardPiece {
+
+        let i = 0;
+        let j = 0;
+
+        const widthOfOneSpot = this.canvas.width/this.lengthOfRow
+        const heightOfOneSpot = this.canvas.height/this.lengthOfCol
+
+        while (i < this.lengthOfCol && j < this.lengthOfRow) {
+            let checkCol = x > widthOfOneSpot*j && x < widthOfOneSpot*(j+1);
+            let checkRow = y > heightOfOneSpot*i && y < heightOfOneSpot*(i+1);
+
+            if (checkRow && checkCol) {
+                break;
+            }
+
+            j++;
+
+            if (j === this.lengthOfRow) {
+                j = 0;
+                i++;
+            }
+
+            if (i === this.lengthOfCol) {
+                break;
+            }
+        }
+        
+        console.log(i,j)
+        
+        return this.getBoardPiece(i,j)
     }
 
     rowColToString(rc : BoardPiece[]) {

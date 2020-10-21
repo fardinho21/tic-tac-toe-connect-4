@@ -84,6 +84,7 @@ export class ComputerPlayer extends Player {
     }
 
     private findBestMove() {
+
         let board = this.gameManager.board;
         let bestVal: number = this.piece === "x" ? -1000 : 1000;
         let bestMove : number[] = [-1,-1];
@@ -107,6 +108,7 @@ export class ComputerPlayer extends Player {
     }
 
     private miniMax(board: TicTacToeBoard, depth: number, isMax: boolean) : number {
+        
         const winner = board.checkForWinner();
         
         if (winner === "x") {

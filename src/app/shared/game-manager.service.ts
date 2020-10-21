@@ -67,17 +67,22 @@ export class GameManagerService {
 
     if (ginfo.opponentPC) {
       this.pc = new ComputerPlayer(this.computerPiece,false,ginfo.difficulty,this);
+    } 
+
+    if (ginfo.gameType === "TTT") {
+      this.board = new TicTacToeBoard(canvas);
       this.computerPiece = Math.floor(Math.random()*2) === 0 ? "o" : "x";
       let playerPiece = this.computerPiece === "x" ? "o" : "x";
       this.computerPieceSubject.next(playerPiece);
       this.turn = Math.floor(Math.random()*2) === 0 ? "o" : "x"
       this.playerTurnSubject.next(this.turn);
-    } 
-
-    if (ginfo.gameType === "TTT") {
-      this.board = new TicTacToeBoard(canvas);
     } else if (ginfo.gameType === "CF") {
       this.board = new ConnectFourBoard(canvas);
+      this.computerPiece = Math.floor(Math.random()*2) === 0 ? "r" : "y";
+      let playerPiece = this.computerPiece === "r" ? "y" : "r";
+      this.computerPieceSubject.next(playerPiece);
+      this.turn = Math.floor(Math.random()*2) === 0 ? "r" : "y"
+      this.playerTurnSubject.next(this.turn);
     }
     
 
@@ -122,7 +127,11 @@ export class GameManagerService {
   }
 
   nextTurn() {
-    this.turn = this.turn === "x" ? "o" : "x";
+    if (this.gameInfo.gameType === "TTT") {
+      this.turn = this.turn === "x" ? "o" : "x";
+    } else if (this.gameInfo.gameType === "CF") {
+      this.turn = this.turn === "r" ? "y" : "r";
+    }
     this.playerTurnSubject.next(this.turn);
   }
 
