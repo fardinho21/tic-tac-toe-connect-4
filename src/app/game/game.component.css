@@ -1,0 +1,33 @@
+main {
+    display: flex;
+    flex-direction: column;
+}
+
+#canvasContainer  {
+    display: flex;
+    justify-content: center;
+    height: 80%;
+}
+
+#buttons {
+    display: flex;
+    justify-content: space-evenly;
+    height: 20%;
+}
+
+button {
+    margin: auto;
+}
+
+#banner {
+    display: flex;
+    justify-content: space-around;
+}
+
+#banner h6 {
+    margin: auto;
+}
+
+.turn {
+    border: 3px solid blue;
+}

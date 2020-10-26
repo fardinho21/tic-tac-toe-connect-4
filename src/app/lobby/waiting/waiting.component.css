@@ -1,0 +1,15 @@
+main {
+    display: flex;
+    flex-direction: column;
+}
+
+#spinner {
+    width: 50%;
+    height: 50%;
+    
+}
+
+#confirm {
+    display: flex;
+    justify-content: space-evenly;
+}

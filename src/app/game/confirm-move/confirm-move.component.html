@@ -1,0 +1,13 @@
+<h4 mat-dialog-title>Confirm</h4>
+<main>
+
+    <section>
+        <p>Are you sure you about your move?</p>
+    </section>
+
+    <section id="buttons">
+        <button mat-flat-button mat-dialog-close color="primary" [disabled]="confirmMoveClicked" type="button" (click)="no()">No</button>
+        <button mat-flat-button color="accent" [disabled]="confirmMoveClicked" type="button" (click)="yes()">Yes</button>
+    </section>
+
+</main>

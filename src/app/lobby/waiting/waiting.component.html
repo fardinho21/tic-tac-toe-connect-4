@@ -1,0 +1,22 @@
+<h4 mat-dialog-title> Waiting </h4>
+<main >
+
+    <section>
+        <p>{{data.message}}</p>
+    </section>
+
+    <section id="spinner">
+        <app-loading *ngIf="!confirm"></app-loading>
+    </section>
+
+    <div *ngIf="!confirm && !denied">
+        <button mat-flat-button color="accent" type="button" (click)="toLobby()">To Lobby</button>
+    </div>
+    <div *ngIf="denied">
+        <button mat-flat-button color="accent" type="button" (click)="onDenied()">Okay</button>
+    </div>
+    <div *ngIf="confirm && !denied" id="confirm">
+        <button mat-flat-button color="accent" type="button" (click)="no()">No</button>
+        <button mat-flat-button color="primary" type="button" (click)="yes()">Yes</button>
+    </div>
+</main>

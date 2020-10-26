@@ -1,1 +1,26 @@
-<p>game works!</p>
+
+<main>
+
+    <div id="banner" *ngIf="!gInfo.opponentPC">
+        <h6 [ngClass]="{turn : gameState && gameState.hostPiece === gameState.turn}">Host : {{hostName}}</h6>
+        <h6 [ngClass]="{turn : gameState && gameState.clientPiece === gameState.turn }">Opponent : {{opponentName}} </h6>
+    </div>
+    <div id="banner" *ngIf="gInfo.opponentPC">
+        <h6 [ngClass]="{turn : turnBool === true }">Host : {{hostName}}</h6>
+        <h6 [ngClass]="{turn : turnBool === false }">Opponent : {{opponentName}} </h6>
+    </div>
+
+
+    <section id="canvasContainer">
+        <canvas #canvas style="border: 5px inset indigo;" (click)="onCanvasClick($event)">
+
+        </canvas>
+    </section>
+
+
+    <section id="buttons">
+        <button mat-flat-button color="accent" type="button" (click)="onQuitGame()">Quit Game</button>
+        <button mat-flat-button color="primary" type="button" [disabled]='!turnBool || !clickedSpot || gameEnd' (click)="onConfirmMove()">Confirm Move</button>
+    </section>
+
+</main>

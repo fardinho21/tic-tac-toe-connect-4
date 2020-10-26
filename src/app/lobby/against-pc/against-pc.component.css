@@ -1,0 +1,14 @@
+form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+section {
+    display: flex;
+    justify-content: center;
+}
+
+button {
+    margin: auto;
+}

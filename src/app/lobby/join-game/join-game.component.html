@@ -1,8 +1,8 @@
 <h4 mat-dialog-title> Join Game</h4>
-<form >
+<main >
 
     <section>
-        <p>{{gameInfo.playerName}}</p>
+        <p>{{gameInfo.hostName}}</p>
         <p>{{gameInfo.gameType}}</p>
         <p>{{gameInfo.gameName}}</p>
     </section>
@@ -10,7 +10,6 @@
 
     <div >
         <button mat-flat-button mat-dialog-close color="accent" type="button" >Back</button>
-
-        <button mat-flat-button color="primary" type="button" >Join</button>
+        <button mat-flat-button color="primary" type="button" (click)="onJoin()" >Join</button>
     </div>
-</form>
+</main>
