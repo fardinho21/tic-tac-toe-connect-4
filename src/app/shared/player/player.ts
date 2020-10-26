@@ -1,7 +1,6 @@
 import { Player } from "./abstract.player";
 import { GameManagerService } from "../game-manager.service";
 import { TicTacToeBoard } from '../board/ttt-board';
-import { verifyHostBindings } from '@angular/compiler';
 
 export class ComputerPlayer extends Player {
 
@@ -38,44 +37,52 @@ export class ComputerPlayer extends Player {
         if (this.mode === "easy") {
             return this.playEasy()
         } else if (this.mode === "medium") {
-            return this.playMedium()
+            return this.playMedOrHard(60)
         } else {
-            return this.playHard()
+            return this.playMedOrHard(80)
         }
-    
-        
 
+    }
+    
+    getPieceFromBoardType(gInfo: GameInfo, r :number, c: number) {
+        
+        if (gInfo.gameType === "TTT") {
+            return this.gameManager.board.getBoardPiece(r,c)
+        } else if (gInfo.gameType === "CF") {
+            const dpidx = this.gameManager.board.getDropPieceIndex([r,c]);
+            return this.gameManager.board.getBoardPiece(dpidx[0],dpidx[1])
+        }
     }
  
     playEasy () {
-        let r = Math.floor(Math.random()*3);
-        let c = Math.floor(Math.random()*3);
-        let piece = this.gameManager.board.getBoardPiece(r,c)
+        const gInfo = this.gameManager.getGameInfo();
+        let r = Math.floor(Math.random()*this.rows);
+        let c = Math.floor(Math.random()*this.columns);
+        let piece = this.getPieceFromBoardType(gInfo, r,c);
+
+        
         while (piece.piece != "") {
-            r = Math.floor(Math.random()*3);
-            c = Math.floor(Math.random()*3);
-            piece = this.gameManager.board.getBoardPiece(r,c);
+            r = Math.floor(Math.random()*this.rows);
+            c = Math.floor(Math.random()*this.columns);
+            piece = this.getPieceFromBoardType(gInfo,r,c);
         }
-        return [r,c]
+        return piece.index;
     }
 
-    playMedium() {
+
+   
+    playMedOrHard(num : number) {
         const decision = Math.floor(Math.random()*100)
 
-        if (decision >= 60) {
+        if (decision >= num) {
             return this.playEasy();
         } else {
-           return this.playMiniMax();
-        }
-    }
-    
-    playHard() {
-        const decision = Math.floor(Math.random()*100)
+            const gInfo = this.gameManager.getGameInfo();
+            if (gInfo.gameType === "TTT") {
+                return this.playMiniMax();
+            } else if (gInfo.gameType === "CF") {
 
-        if (decision >= 80) {
-            return this.playEasy();
-        } else {
-            return this.playMiniMax();
+            }
         }
     }
 
@@ -86,17 +93,17 @@ export class ComputerPlayer extends Player {
     private findBestMove() {
 
         let board = this.gameManager.board;
-        let bestVal: number = this.piece === "x" ? -1000 : 1000;
+        let bestVal: number = this.piece === this.pieceOne? -1000 : 1000;
         let bestMove : number[] = [-1,-1];
 
-        for (let r = 0 ; r < 3; r++) {
-            for (let c = 0; c < 3; c++) {
+        for (let r = 0 ; r < this.rows; r++) {
+            for (let c = 0; c < this.columns; c++) {
                 if (board.getBoardPiece(r,c).piece === "") {
                     board.placePiece([r,c], this.piece, false)
-                    let isMaximizer = this.piece === "x" ? true : false;
-                    let moveVal = this.miniMax(board,0,!isMaximizer);
+                    let isMaximizer = this.piece === this.pieceOne ? true : false;
+                    let moveVal = this.miniMax(board,0,!isMaximizer,[r,c]);
                     board.removePiece([r,c]);
-                    let check = this.piece === "x" ? moveVal > bestVal : moveVal < bestVal;
+                    let check = this.piece === this.pieceOne ? moveVal > bestVal : moveVal < bestVal;
                     if (check) {
                         bestMove = [r,c]
                         bestVal = moveVal
@@ -107,15 +114,16 @@ export class ComputerPlayer extends Player {
         return bestMove;
     }
 
-    private miniMax(board: TicTacToeBoard, depth: number, isMax: boolean) : number {
+    private miniMax(board: TicTacToeBoard, depth: number, isMax: boolean, move? : number[]) : number {
         
-        const winner = board.checkForWinner();
+        const winner = board.checkForWinner(move);
         
-        if (winner === "x") {
+        if (winner === this.pieceOne) {
             return 10 - depth;
-        } else if (winner === "o") {
+        } else if (winner === this.pieceTwo) {
             return -10 + depth;
         } 
+
 
         const movesLeft = board.emptySpots;
 
@@ -125,11 +133,12 @@ export class ComputerPlayer extends Player {
 
         if (isMax) {
             let bestVal = -10000
-            for (let r = 0; r < 3; r++) {
-                for (let c = 0; c < 3; c++) {
+    
+            for (let r = 0; r < this.rows; r++) {
+                for (let c = 0; c < this.columns; c++) {
                     if (board.getBoardPiece(r,c).piece === "") {
-                        board.placePiece([r,c], "x", false)
-                        let value = this.miniMax(board, depth+1, !isMax)
+                        board.placePiece([r,c], this.pieceOne, false)
+                        let value = this.miniMax(board, depth+1, !isMax, [r,c])
                         value = !!value ? value : 0;
                         bestVal = Math.max(bestVal, value)
                         board.removePiece([r,c])
@@ -141,11 +150,12 @@ export class ComputerPlayer extends Player {
 
         } else {
             let bestVal = 10000
-            for (let r = 0; r < 3; r++) {
-                for (let c = 0; c < 3; c++) {
+
+            for (let r = 0; r < this.rows; r++) {
+                for (let c = 0; c < this.columns; c++) {
                     if (board.getBoardPiece(r,c).piece === "") {
-                        board.placePiece([r,c], "o", false)
-                        let value = this.miniMax(board, depth+1, !isMax)
+                        board.placePiece([r,c], this.pieceTwo, false)
+                        let value = this.miniMax(board, depth+1, !isMax, [r,c])
                         value = !!value ? value : 0;
                         bestVal = Math.min(bestVal, value)
                         board.removePiece([r,c])

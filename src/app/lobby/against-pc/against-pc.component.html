@@ -4,17 +4,18 @@
     <mat-form-field>
         <mat-label>Game Type</mat-label>
         <mat-select required ngModel name="gameType" apperance="fill">
-            <mat-option value="TTT">
+            <mat-option value="TTT" (click)="setMode('TTT')">
                 Tic-Tac-Toe
             </mat-option>
-            <mat-option value="CF">
+            <mat-option value="CF" (click)="setMode('CF')">
                 Connect 4
             </mat-option>
         </mat-select>
     </mat-form-field>
+    
     <mat-form-field>
         <mat-label>Game Difficulty </mat-label>
-        <mat-select required ngModel name="gameDiff" apperance="fill">
+        <mat-select required ngModel name="gameDiff" apperance="fill" [disabled]="mode === 'CF'">
             <mat-option value="easy">
                 Easy
             </mat-option>

@@ -10,7 +10,7 @@ export class TicTacToeBoard extends Board{
         console.log(this.boardArray);
     }
 
-    checkForWinner() : string {
+    checkForWinner(move? : number[]) : string {
 
         const checkDiag1 = this.boardArray[0][0].piece === this.boardArray[1][1].piece &&
                            this.boardArray[1][1].piece === this.boardArray[2][2].piece
@@ -128,6 +128,8 @@ export class TicTacToeBoard extends Board{
         
 
     }
+
+    getDropPieceIndex(move:number[]) : number[] {return [-1,-1]}
 
     getBoardPiece( r:number, c:number) : BoardPiece {
         return this.boardArray[r][c]

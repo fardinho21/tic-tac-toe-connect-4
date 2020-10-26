@@ -22,31 +22,19 @@ export abstract class Board {
     public emptySpots : number;
     public unsetAndEmptySpots : number; 
 
-    abstract checkForWinner();
+    abstract checkForWinner(move? : number[]);
     abstract rowColToString(rc : BoardPiece[]);
     abstract clickBoard(x:number,y:number):BoardPiece;
     abstract getBoardPiece(r:number,c:number):BoardPiece;
     abstract drawBoard();
     abstract printBoard();
     abstract drawPieces();
+    abstract getDropPieceIndex(move: number[], playerPiece: string) : number[];
+
 
     clearBoard() {
         this.context.clearRect(0,0,this.canvas.width, this.canvas.height);
         this.canvasSubject.next(this.canvas);
-    }
-
-    placePiece(index: number[], playerPiece:string, isFinal : boolean) {
-        let boardPiece = this.boardArray[index[0]][index[1]];
-        boardPiece.piece = playerPiece;
-        
-        if (isFinal) {
-            this.unsetAndEmptySpots -= 1;
-            boardPiece.set = true;            
-        }
-
-        this.boardArray[index[0]][index[1]] = boardPiece;
-        this.emptySpots = this.emptySpots - 1 <= 0 ? 0 : this.emptySpots - 1;
-
     }
 
     removePiece(index: number[]) {
@@ -67,6 +55,20 @@ export abstract class Board {
         this.canvasSubject.next(this.canvas);
     }
 
+    placePiece(index: number[], playerPiece:string, isFinal : boolean) {
+        let boardPiece = this.boardArray[index[0]][index[1]];
+        boardPiece.piece = playerPiece;
+        
+        if (isFinal) {
+            this.unsetAndEmptySpots -= 1;
+            boardPiece.set = true;            
+        }
+
+        this.boardArray[index[0]][index[1]] = boardPiece;
+        this.emptySpots = this.emptySpots - 1 <= 0 ? 0 : this.emptySpots - 1;
+    }
+
+    
 
     emptyBoard() {
 

@@ -202,7 +202,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/__ivy_ngcc__/fesm2015/core.js");
 /* harmony import */ var _angular_material_dialog__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/material/dialog */ "./node_modules/@angular/material/__ivy_ngcc__/fesm2015/dialog.js");
 /* harmony import */ var _shared_game_manager_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../shared/game-manager.service */ "./src/app/shared/game-manager.service.ts");
-/* harmony import */ var _angular_material_button__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @angular/material/button */ "./node_modules/@angular/material/__ivy_ngcc__/fesm2015/button.js");
+/* harmony import */ var src_app_shared_backend_service__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! src/app/shared/backend.service */ "./src/app/shared/backend.service.ts");
+/* harmony import */ var _angular_material_button__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @angular/material/button */ "./node_modules/@angular/material/__ivy_ngcc__/fesm2015/button.js");
+
 
 
 
@@ -210,9 +212,10 @@ __webpack_require__.r(__webpack_exports__);
 
 
 class ConfirmMoveComponent {
-    constructor(move, gameManager) {
-        this.move = move;
+    constructor(data, gameManager, backendManager) {
+        this.data = data;
         this.gameManager = gameManager;
+        this.backendManager = backendManager;
         this.confirmMoveClicked = false;
     }
     ngOnInit() {
@@ -220,12 +223,16 @@ class ConfirmMoveComponent {
     }
     yes() {
         this.confirmMoveClicked = true;
-        this.gameManager.confirmMove(this.move[0], this.move[1]);
+        const gInfo = this.data.gInfo;
+        if (!gInfo.opponentPC) {
+            this.backendManager.confirmMove(gInfo, this.gameManager.playerName === gInfo.hostName, this.data.move);
+        }
+        this.gameManager.confirmMove(this.data.move, this.data.playerPiece);
     }
     no() {
     }
 }
-ConfirmMoveComponent.ɵfac = function ConfirmMoveComponent_Factory(t) { return new (t || ConfirmMoveComponent)(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_angular_material_dialog__WEBPACK_IMPORTED_MODULE_1__["MAT_DIALOG_DATA"]), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_shared_game_manager_service__WEBPACK_IMPORTED_MODULE_2__["GameManagerService"])); };
+ConfirmMoveComponent.ɵfac = function ConfirmMoveComponent_Factory(t) { return new (t || ConfirmMoveComponent)(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_angular_material_dialog__WEBPACK_IMPORTED_MODULE_1__["MAT_DIALOG_DATA"]), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_shared_game_manager_service__WEBPACK_IMPORTED_MODULE_2__["GameManagerService"]), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](src_app_shared_backend_service__WEBPACK_IMPORTED_MODULE_3__["BackendService"])); };
 ConfirmMoveComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"]({ type: ConfirmMoveComponent, selectors: [["app-confirm-move"]], decls: 11, vars: 2, consts: [["mat-dialog-title", ""], ["id", "buttons"], ["mat-flat-button", "", "mat-dialog-close", "", "color", "primary", "type", "button", 3, "disabled", "click"], ["mat-flat-button", "", "color", "accent", "type", "button", 3, "disabled", "click"]], template: function ConfirmMoveComponent_Template(rf, ctx) { if (rf & 1) {
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "h4", 0);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](1, "Confirm");
@@ -252,7 +259,7 @@ ConfirmMoveComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdef
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("disabled", ctx.confirmMoveClicked);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](2);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("disabled", ctx.confirmMoveClicked);
-    } }, directives: [_angular_material_dialog__WEBPACK_IMPORTED_MODULE_1__["MatDialogTitle"], _angular_material_button__WEBPACK_IMPORTED_MODULE_3__["MatButton"], _angular_material_dialog__WEBPACK_IMPORTED_MODULE_1__["MatDialogClose"]], styles: ["main[_ngcontent-%COMP%] {\n    display: flex;\n    flex-direction: column;\n}\n\n#buttons[_ngcontent-%COMP%] {\n    display: flex;\n    justify-content: center;\n}\n\nbutton[_ngcontent-%COMP%] {\n    margin: auto\n}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9hcHAvZ2FtZS9jb25maXJtLW1vdmUvY29uZmlybS1tb3ZlLmNvbXBvbmVudC5jc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7SUFDSSxhQUFhO0lBQ2Isc0JBQXNCO0FBQzFCOztBQUVBO0lBQ0ksYUFBYTtJQUNiLHVCQUF1QjtBQUMzQjs7QUFFQTtJQUNJO0FBQ0oiLCJmaWxlIjoic3JjL2FwcC9nYW1lL2NvbmZpcm0tbW92ZS9jb25maXJtLW1vdmUuY29tcG9uZW50LmNzcyIsInNvdXJjZXNDb250ZW50IjpbIm1haW4ge1xuICAgIGRpc3BsYXk6IGZsZXg7XG4gICAgZmxleC1kaXJlY3Rpb246IGNvbHVtbjtcbn1cblxuI2J1dHRvbnMge1xuICAgIGRpc3BsYXk6IGZsZXg7XG4gICAganVzdGlmeS1jb250ZW50OiBjZW50ZXI7XG59XG5cbmJ1dHRvbiB7XG4gICAgbWFyZ2luOiBhdXRvXG59Il19 */"] });
+    } }, directives: [_angular_material_dialog__WEBPACK_IMPORTED_MODULE_1__["MatDialogTitle"], _angular_material_button__WEBPACK_IMPORTED_MODULE_4__["MatButton"], _angular_material_dialog__WEBPACK_IMPORTED_MODULE_1__["MatDialogClose"]], styles: ["main[_ngcontent-%COMP%] {\n    display: flex;\n    flex-direction: column;\n}\n\n#buttons[_ngcontent-%COMP%] {\n    display: flex;\n    justify-content: center;\n}\n\nbutton[_ngcontent-%COMP%] {\n    margin: auto\n}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9hcHAvZ2FtZS9jb25maXJtLW1vdmUvY29uZmlybS1tb3ZlLmNvbXBvbmVudC5jc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7SUFDSSxhQUFhO0lBQ2Isc0JBQXNCO0FBQzFCOztBQUVBO0lBQ0ksYUFBYTtJQUNiLHVCQUF1QjtBQUMzQjs7QUFFQTtJQUNJO0FBQ0oiLCJmaWxlIjoic3JjL2FwcC9nYW1lL2NvbmZpcm0tbW92ZS9jb25maXJtLW1vdmUuY29tcG9uZW50LmNzcyIsInNvdXJjZXNDb250ZW50IjpbIm1haW4ge1xuICAgIGRpc3BsYXk6IGZsZXg7XG4gICAgZmxleC1kaXJlY3Rpb246IGNvbHVtbjtcbn1cblxuI2J1dHRvbnMge1xuICAgIGRpc3BsYXk6IGZsZXg7XG4gICAganVzdGlmeS1jb250ZW50OiBjZW50ZXI7XG59XG5cbmJ1dHRvbiB7XG4gICAgbWFyZ2luOiBhdXRvXG59Il19 */"] });
 /*@__PURE__*/ (function () { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"](ConfirmMoveComponent, [{
         type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"],
         args: [{
@@ -263,7 +270,7 @@ ConfirmMoveComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdef
     }], function () { return [{ type: undefined, decorators: [{
                 type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Inject"],
                 args: [_angular_material_dialog__WEBPACK_IMPORTED_MODULE_1__["MAT_DIALOG_DATA"]]
-            }] }, { type: _shared_game_manager_service__WEBPACK_IMPORTED_MODULE_2__["GameManagerService"] }]; }, null); })();
+            }] }, { type: _shared_game_manager_service__WEBPACK_IMPORTED_MODULE_2__["GameManagerService"] }, { type: src_app_shared_backend_service__WEBPACK_IMPORTED_MODULE_3__["BackendService"] }]; }, null); })();
 
 
 /***/ }),
@@ -327,7 +334,7 @@ GameEndComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineC
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtextInterpolate"](ctx.header);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](4);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtextInterpolate"](ctx.message);
-    } }, directives: [_angular_material_dialog__WEBPACK_IMPORTED_MODULE_1__["MatDialogTitle"], _angular_material_button__WEBPACK_IMPORTED_MODULE_2__["MatButton"], _angular_material_dialog__WEBPACK_IMPORTED_MODULE_1__["MatDialogClose"]], styles: ["\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IiIsImZpbGUiOiJzcmMvYXBwL2dhbWUvZ2FtZS1lbmQvZ2FtZS1lbmQuY29tcG9uZW50LmNzcyJ9 */"] });
+    } }, directives: [_angular_material_dialog__WEBPACK_IMPORTED_MODULE_1__["MatDialogTitle"], _angular_material_button__WEBPACK_IMPORTED_MODULE_2__["MatButton"], _angular_material_dialog__WEBPACK_IMPORTED_MODULE_1__["MatDialogClose"]], styles: ["main[_ngcontent-%COMP%] {\n    display: flex;\n    flex-direction: column;\n}\n\n\nbutton[_ngcontent-%COMP%] {\n    margin: auto\n}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9hcHAvZ2FtZS9nYW1lLWVuZC9nYW1lLWVuZC5jb21wb25lbnQuY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksYUFBYTtJQUNiLHNCQUFzQjtBQUMxQjs7O0FBR0E7SUFDSTtBQUNKIiwiZmlsZSI6InNyYy9hcHAvZ2FtZS9nYW1lLWVuZC9nYW1lLWVuZC5jb21wb25lbnQuY3NzIiwic291cmNlc0NvbnRlbnQiOlsibWFpbiB7XG4gICAgZGlzcGxheTogZmxleDtcbiAgICBmbGV4LWRpcmVjdGlvbjogY29sdW1uO1xufVxuXG5cbmJ1dHRvbiB7XG4gICAgbWFyZ2luOiBhdXRvXG59Il19 */"] });
 /*@__PURE__*/ (function () { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"](GameEndComponent, [{
         type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"],
         args: [{
@@ -378,6 +385,46 @@ __webpack_require__.r(__webpack_exports__);
 
 const _c0 = ["canvas"];
 const _c1 = function (a0) { return { turn: a0 }; };
+function GameComponent_div_1_Template(rf, ctx) { if (rf & 1) {
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "div", 7);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](1, "h6", 8);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](2);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](3, "h6", 8);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](4);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+} if (rf & 2) {
+    const ctx_r0 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngClass", _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵpureFunction1"](4, _c1, ctx_r0.gameState && ctx_r0.gameState.hostPiece === ctx_r0.gameState.turn));
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtextInterpolate1"]("Host : ", ctx_r0.hostName, "");
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngClass", _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵpureFunction1"](6, _c1, ctx_r0.gameState && ctx_r0.gameState.clientPiece === ctx_r0.gameState.turn));
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtextInterpolate1"]("Opponent : ", ctx_r0.opponentName, " ");
+} }
+function GameComponent_div_2_Template(rf, ctx) { if (rf & 1) {
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "div", 7);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](1, "h6", 8);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](2);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](3, "h6", 8);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](4);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+} if (rf & 2) {
+    const ctx_r1 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngClass", _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵpureFunction1"](4, _c1, ctx_r1.turnBool === true));
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtextInterpolate1"]("Host : ", ctx_r1.hostName, "");
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngClass", _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵpureFunction1"](6, _c1, ctx_r1.turnBool === false));
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtextInterpolate1"]("Opponent : ", ctx_r1.opponentName, " ");
+} }
 class GameComponent {
     constructor(gameManager, backendManager, dialog, router) {
         this.gameManager = gameManager;
@@ -389,13 +436,17 @@ class GameComponent {
         this.turnBool = false;
         this.gameEnd = false;
         this.gInfo = gameManager.getGameInfo();
+        this.gameState = {
+            gameMode: "", turn: "", hostPiece: "", clientPiece: "", hostName: "", clientName: "",
+            gameOver: false, clientLeft: false, hostLeft: false, winner: "", board: [], lastUpdatedPiece: null
+        };
         this.hostName = this.gInfo.hostName;
         this.opponentName = this.gInfo.opponentPC ? "Computer" : this.gInfo.opponentName;
     }
     ngOnInit() {
         //subscriptions
         this.gameInfoSubscription = this.gameManager.gameInfoSubject.subscribe(gameInfo => {
-            if (!gameInfo) {
+            if (!gameInfo.gameName) {
                 this.closeDialog();
                 this.turnBool = false;
                 this.playerPiece = null;
@@ -408,7 +459,7 @@ class GameComponent {
             this.closeDialog();
             this.turnBool = turn === this.playerPiece ? true : false;
         });
-        if (this.opponentName == "Computer") {
+        if (this.opponentName === "Computer") {
             this.computerPieceSubscription = this.gameManager.computerPieceSubject.subscribe(piece => {
                 this.playerPiece = piece;
             });
@@ -416,22 +467,67 @@ class GameComponent {
         this.gameEndSubscription = this.gameManager.gameEndSubject.subscribe(check => {
             this.closeDialog();
             this.gameEnd = true;
+            this.backendManager.declareWinner(this.gInfo, check, this.gameManager.playerName === this.hostName);
             this.onGameEnd(check);
         });
         if (this.opponentName != "Computer" || !this.gInfo.opponentPC) {
             this.backendSubscription = this.backendManager.backendSubject.subscribe(response => {
                 if (response.extra === "gameStarted") {
-                    console.log(response.gameState);
+                    if (this.gameManager.playerName === this.hostName) {
+                        this.playerPiece = response.gameState.hostPiece;
+                    }
+                    this.turnBool = response.gameState.turn === this.playerPiece ? true : false;
                 }
+                else if (response.extra.msg) {
+                    if (response.extra.win != this.playerPiece) {
+                        this.updateBoardFromGameState(response);
+                        this.gameManager.endGame(response.extra.win);
+                        this.clearDBQueryInterval();
+                    }
+                }
+                else if (response.extra === "clientLeft") {
+                    console.log("client left");
+                }
+                else if (response.extra === "hostLeft") {
+                    console.log("client host");
+                }
+                else if (response.extra === "hostTurn") {
+                    this.turnBool = response.gameState.hostName === this.gameManager.playerName ? true : false;
+                }
+                else if (response.extra === "clientTurn") {
+                    this.turnBool = response.gameState.hostName != this.gameManager.playerName ? true : false;
+                }
+                else if (response.extra === "serverError") {
+                    console.log(response);
+                }
+                else if (response.extra === "moveConfirmed") {
+                    this.clearDBQueryInterval();
+                    this.gameState = response.gameState;
+                    this.startDBQueryInterval();
+                }
+                else if (response.extra === "winnerSet") {
+                    console.log("congratulations");
+                }
+                this.updateBoardFromGameState(response);
             });
         }
     }
     ngOnDestroy() {
+        if (this.gameManager.playerName === this.hostName) {
+            this.backendManager.deleteGame(this.gInfo);
+            this.backendManager.deleteGameState(this.gameState);
+        }
         this.gameInfoSubscription.unsubscribe();
         this.canvasSubscription.unsubscribe();
         this.turnSubsription.unsubscribe();
-        this.computerPieceSubscription.unsubscribe();
+        try {
+            this.computerPieceSubscription.unsubscribe();
+        }
+        catch (err) {
+            console.log(err);
+        }
         this.gameEndSubscription.unsubscribe();
+        this.clearDBQueryInterval();
         this.closeDialog();
         this.clickedSpot = null;
         this.gameManager = null;
@@ -441,15 +537,25 @@ class GameComponent {
         this.canvas.width = window.innerWidth * 0.7;
         this.canvas.height = window.innerHeight * 0.8;
         this.gameManager.startGame(this.canvas);
-        this.backendManager.startGame(this.gInfo, this.gameManager.board);
+        if (!this.gInfo.opponentPC) {
+            if (this.gameManager.playerName === this.hostName) {
+                this.backendManager.startGame(this.gInfo, this.gameManager.board);
+            }
+            this.startDBQueryInterval();
+        }
         //subscriptions
         this.canvasSubscription = this.gameManager.board.canvasSubject.subscribe((canvas) => {
             this.canvas = canvas;
         });
     }
     onResize(event) {
-        this.gameManager.board.setCanvasDimensions(window.innerWidth * 0.7, window.innerHeight * 0.8);
-        this.gameManager.board.drawBoardAndPieces();
+        try {
+            this.gameManager.board.setCanvasDimensions(window.innerWidth * 0.7, window.innerHeight * 0.8);
+            this.gameManager.board.drawBoardAndPieces();
+        }
+        catch (err) {
+            console.log(err);
+        }
     }
     onCanvasClick(event) {
         //do nothing if it is not the player's turn
@@ -478,7 +584,12 @@ class GameComponent {
         }
     }
     onConfirmMove() {
-        this.dialogRef = this.dialog.open(_confirm_move_confirm_move_component__WEBPACK_IMPORTED_MODULE_3__["ConfirmMoveComponent"], { data: [this.clickedSpot, this.playerPiece] });
+        this.dialogRef = this.dialog.open(_confirm_move_confirm_move_component__WEBPACK_IMPORTED_MODULE_3__["ConfirmMoveComponent"], { data: {
+                move: this.clickedSpot,
+                playerPiece: this.playerPiece,
+                gInfo: this.gInfo
+            }
+        });
     }
     onQuitGame() {
         this.dialogRef = this.dialog.open(_quit_game_quit_game_component__WEBPACK_IMPORTED_MODULE_1__["QuitGameComponent"]);
@@ -492,10 +603,36 @@ class GameComponent {
         }
         this.dialogRef = null;
     }
+    updateBoardFromGameState(response) {
+        try {
+            if (!this.playerPiece) {
+                if (this.gameManager.playerName === this.hostName) {
+                    this.playerPiece = response.gameState.hostPiece;
+                }
+                else {
+                    this.playerPiece = response.gameState.clientPiece;
+                }
+            }
+            this.turnBool = response.gameState.turn === this.playerPiece ? true : false;
+            this.gameState = response.gameState;
+            if (!this.previouslyUpdatedPiece || this.gameState.lastUpdatedPiece.index != this.previouslyUpdatedPiece.index) {
+                const index = this.gameState.lastUpdatedPiece.index;
+                this.previouslyUpdatedPiece = this.gameState.lastUpdatedPiece;
+                this.gameManager.board.boardArray[index[0]][index[1]] = this.gameState.lastUpdatedPiece;
+                this.gameManager.board.drawBoardAndPieces();
+            }
+        }
+        catch (error) {
+            console.log(error);
+        }
+    }
     startDBQueryInterval() {
         this.dbQueryInterval = setInterval(() => {
-            this.backendManager.checkGameState();
+            this.backendManager.checkGameState(this.gInfo, this.hostName === this.gameManager.playerName);
         }, 1000);
+    }
+    clearDBQueryInterval() {
+        clearInterval(this.dbQueryInterval);
     }
 }
 GameComponent.ɵfac = function GameComponent_Factory(t) { return new (t || GameComponent)(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_shared_game_manager_service__WEBPACK_IMPORTED_MODULE_5__["GameManagerService"]), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_shared_backend_service__WEBPACK_IMPORTED_MODULE_6__["BackendService"]), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_angular_material_dialog__WEBPACK_IMPORTED_MODULE_7__["MatDialog"]), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_angular_router__WEBPACK_IMPORTED_MODULE_8__["Router"])); };
@@ -506,44 +643,34 @@ GameComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComp
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵqueryRefresh"](_t = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵloadQuery"]()) && (ctx.canvasElRef = _t.first);
     } }, hostBindings: function GameComponent_HostBindings(rf, ctx) { if (rf & 1) {
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵlistener"]("resize", function GameComponent_resize_HostBindingHandler($event) { return ctx.onResize($event); }, false, _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵresolveWindow"]);
-    } }, decls: 14, vars: 9, consts: [["id", "banner"], [3, "ngClass"], ["id", "canvasContainer"], [2, "border", "5px inset indigo", 3, "click"], ["canvas", ""], ["id", "buttons"], ["mat-flat-button", "", "color", "accent", "type", "button", 3, "click"], ["mat-flat-button", "", "color", "primary", "type", "button", 3, "disabled", "click"]], template: function GameComponent_Template(rf, ctx) { if (rf & 1) {
+    } }, decls: 11, vars: 3, consts: [["id", "banner", 4, "ngIf"], ["id", "canvasContainer"], [2, "border", "5px inset indigo", 3, "click"], ["canvas", ""], ["id", "buttons"], ["mat-flat-button", "", "color", "accent", "type", "button", 3, "click"], ["mat-flat-button", "", "color", "primary", "type", "button", 3, "disabled", "click"], ["id", "banner"], [3, "ngClass"]], template: function GameComponent_Template(rf, ctx) { if (rf & 1) {
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "main");
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](1, "div", 0);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](2, "h6", 1);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](3);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](4, "h6", 1);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](5);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](6, "section", 2);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](7, "canvas", 3, 4);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵlistener"]("click", function GameComponent_Template_canvas_click_7_listener($event) { return ctx.onCanvasClick($event); });
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](1, GameComponent_div_1_Template, 5, 8, "div", 0);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](2, GameComponent_div_2_Template, 5, 8, "div", 0);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](3, "section", 1);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](4, "canvas", 2, 3);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵlistener"]("click", function GameComponent_Template_canvas_click_4_listener($event) { return ctx.onCanvasClick($event); });
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](9, "section", 5);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](10, "button", 6);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵlistener"]("click", function GameComponent_Template_button_click_10_listener() { return ctx.onQuitGame(); });
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](11, "Quit Game");
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](6, "section", 4);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](7, "button", 5);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵlistener"]("click", function GameComponent_Template_button_click_7_listener() { return ctx.onQuitGame(); });
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](8, "Quit Game");
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](12, "button", 7);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵlistener"]("click", function GameComponent_Template_button_click_12_listener() { return ctx.onConfirmMove(); });
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](13, "Confirm Move");
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](9, "button", 6);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵlistener"]("click", function GameComponent_Template_button_click_9_listener() { return ctx.onConfirmMove(); });
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](10, "Confirm Move");
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
     } if (rf & 2) {
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](2);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngClass", _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵpureFunction1"](5, _c1, ctx.turnBool === true));
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtextInterpolate1"]("Host : ", ctx.hostName, "");
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", !ctx.gInfo.opponentPC);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngClass", _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵpureFunction1"](7, _c1, ctx.turnBool === false));
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtextInterpolate1"]("Opponent : ", ctx.opponentName, " ");
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx.gInfo.opponentPC);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](7);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("disabled", !ctx.turnBool || !ctx.clickedSpot || ctx.gameEnd);
-    } }, directives: [_angular_common__WEBPACK_IMPORTED_MODULE_9__["NgClass"], _angular_material_button__WEBPACK_IMPORTED_MODULE_10__["MatButton"]], styles: ["main[_ngcontent-%COMP%] {\n    display: flex;\n    flex-direction: column;\n}\n\n#canvasContainer[_ngcontent-%COMP%]  {\n    display: flex;\n    justify-content: center;\n    height: 80%;\n}\n\n#buttons[_ngcontent-%COMP%] {\n    display: flex;\n    justify-content: space-evenly;\n    height: 20%;\n}\n\nbutton[_ngcontent-%COMP%] {\n    margin: auto;\n}\n\n#banner[_ngcontent-%COMP%] {\n    display: flex;\n    justify-content: space-around;\n}\n\n#banner[_ngcontent-%COMP%]   h6[_ngcontent-%COMP%] {\n    margin: auto;\n}\n\n.turn[_ngcontent-%COMP%] {\n    border: 3px solid blue;\n}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9hcHAvZ2FtZS9nYW1lLmNvbXBvbmVudC5jc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7SUFDSSxhQUFhO0lBQ2Isc0JBQXNCO0FBQzFCOztBQUVBO0lBQ0ksYUFBYTtJQUNiLHVCQUF1QjtJQUN2QixXQUFXO0FBQ2Y7O0FBRUE7SUFDSSxhQUFhO0lBQ2IsNkJBQTZCO0lBQzdCLFdBQVc7QUFDZjs7QUFFQTtJQUNJLFlBQVk7QUFDaEI7O0FBRUE7SUFDSSxhQUFhO0lBQ2IsNkJBQTZCO0FBQ2pDOztBQUVBO0lBQ0ksWUFBWTtBQUNoQjs7QUFFQTtJQUNJLHNCQUFzQjtBQUMxQiIsImZpbGUiOiJzcmMvYXBwL2dhbWUvZ2FtZS5jb21wb25lbnQuY3NzIiwic291cmNlc0NvbnRlbnQiOlsibWFpbiB7XG4gICAgZGlzcGxheTogZmxleDtcbiAgICBmbGV4LWRpcmVjdGlvbjogY29sdW1uO1xufVxuXG4jY2FudmFzQ29udGFpbmVyICB7XG4gICAgZGlzcGxheTogZmxleDtcbiAgICBqdXN0aWZ5LWNvbnRlbnQ6IGNlbnRlcjtcbiAgICBoZWlnaHQ6IDgwJTtcbn1cblxuI2J1dHRvbnMge1xuICAgIGRpc3BsYXk6IGZsZXg7XG4gICAganVzdGlmeS1jb250ZW50OiBzcGFjZS1ldmVubHk7XG4gICAgaGVpZ2h0OiAyMCU7XG59XG5cbmJ1dHRvbiB7XG4gICAgbWFyZ2luOiBhdXRvO1xufVxuXG4jYmFubmVyIHtcbiAgICBkaXNwbGF5OiBmbGV4O1xuICAgIGp1c3RpZnktY29udGVudDogc3BhY2UtYXJvdW5kO1xufVxuXG4jYmFubmVyIGg2IHtcbiAgICBtYXJnaW46IGF1dG87XG59XG5cbi50dXJuIHtcbiAgICBib3JkZXI6IDNweCBzb2xpZCBibHVlO1xufSJdfQ== */"] });
+    } }, directives: [_angular_common__WEBPACK_IMPORTED_MODULE_9__["NgIf"], _angular_material_button__WEBPACK_IMPORTED_MODULE_10__["MatButton"], _angular_common__WEBPACK_IMPORTED_MODULE_9__["NgClass"]], styles: ["main[_ngcontent-%COMP%] {\n    display: flex;\n    flex-direction: column;\n}\n\n#canvasContainer[_ngcontent-%COMP%]  {\n    display: flex;\n    justify-content: center;\n    height: 80%;\n}\n\n#buttons[_ngcontent-%COMP%] {\n    display: flex;\n    justify-content: space-evenly;\n    height: 20%;\n}\n\nbutton[_ngcontent-%COMP%] {\n    margin: auto;\n}\n\n#banner[_ngcontent-%COMP%] {\n    display: flex;\n    justify-content: space-around;\n}\n\n#banner[_ngcontent-%COMP%]   h6[_ngcontent-%COMP%] {\n    margin: auto;\n}\n\n.turn[_ngcontent-%COMP%] {\n    border: 3px solid blue;\n}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9hcHAvZ2FtZS9nYW1lLmNvbXBvbmVudC5jc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7SUFDSSxhQUFhO0lBQ2Isc0JBQXNCO0FBQzFCOztBQUVBO0lBQ0ksYUFBYTtJQUNiLHVCQUF1QjtJQUN2QixXQUFXO0FBQ2Y7O0FBRUE7SUFDSSxhQUFhO0lBQ2IsNkJBQTZCO0lBQzdCLFdBQVc7QUFDZjs7QUFFQTtJQUNJLFlBQVk7QUFDaEI7O0FBRUE7SUFDSSxhQUFhO0lBQ2IsNkJBQTZCO0FBQ2pDOztBQUVBO0lBQ0ksWUFBWTtBQUNoQjs7QUFFQTtJQUNJLHNCQUFzQjtBQUMxQiIsImZpbGUiOiJzcmMvYXBwL2dhbWUvZ2FtZS5jb21wb25lbnQuY3NzIiwic291cmNlc0NvbnRlbnQiOlsibWFpbiB7XG4gICAgZGlzcGxheTogZmxleDtcbiAgICBmbGV4LWRpcmVjdGlvbjogY29sdW1uO1xufVxuXG4jY2FudmFzQ29udGFpbmVyICB7XG4gICAgZGlzcGxheTogZmxleDtcbiAgICBqdXN0aWZ5LWNvbnRlbnQ6IGNlbnRlcjtcbiAgICBoZWlnaHQ6IDgwJTtcbn1cblxuI2J1dHRvbnMge1xuICAgIGRpc3BsYXk6IGZsZXg7XG4gICAganVzdGlmeS1jb250ZW50OiBzcGFjZS1ldmVubHk7XG4gICAgaGVpZ2h0OiAyMCU7XG59XG5cbmJ1dHRvbiB7XG4gICAgbWFyZ2luOiBhdXRvO1xufVxuXG4jYmFubmVyIHtcbiAgICBkaXNwbGF5OiBmbGV4O1xuICAgIGp1c3RpZnktY29udGVudDogc3BhY2UtYXJvdW5kO1xufVxuXG4jYmFubmVyIGg2IHtcbiAgICBtYXJnaW46IGF1dG87XG59XG5cbi50dXJuIHtcbiAgICBib3JkZXI6IDNweCBzb2xpZCBibHVlO1xufSJdfQ== */"] });
 /*@__PURE__*/ (function () { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"](GameComponent, [{
         type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"],
         args: [{
@@ -936,6 +1063,7 @@ class JoinGameComponent {
         console.log(this.gameInfo);
         this.backendSubscription = this.backendManager.getBackEndSubject().subscribe((brResponse) => {
             if (brResponse.extra === "gameFound:Waiting") {
+                this.gameInfo.inSession = true;
                 this.gameManager.setGameInfo(this.gameInfo);
             }
         });
@@ -1112,7 +1240,7 @@ class LobbyComponent {
                 clearInterval(this.checkDataBase);
                 this.router.navigate(['/game']);
             }
-            else if (!gameInfo.playersReady) {
+            else if (!gameInfo.playersReady && !gameInfo.opponentPC) {
                 if (gameInfo.hostName === this.gameManager.playerName) {
                     this.dialogRef = this.dialog.open(_waiting_waiting_component__WEBPACK_IMPORTED_MODULE_5__["WaitingComponent"], { data: { message: "Waiting for client to join.", isHost: true } });
                 }
@@ -1660,8 +1788,37 @@ class BackendService {
             this.backendSubject.next(response);
         });
     }
-    checkGameState() {
-        this.http.post(this.BASE_URL + "gameplay/check", {});
+    checkGameState(gInfo, isHost) {
+        this.http.post(this.BASE_URL + "gameplay/check", {
+            gameMode: gInfo.gameType,
+            hostName: gInfo.hostName,
+            clientName: gInfo.opponentName,
+            isHost: isHost
+        }).subscribe(response => {
+            this.backendSubject.next(response);
+        });
+    }
+    confirmMove(gInfo, isHost, move) {
+        this.http.post(this.BASE_URL + "gameplay/confirmMove", {
+            gameMode: gInfo.gameType,
+            hostName: gInfo.hostName,
+            clientName: gInfo.opponentName,
+            isHost: isHost,
+            move: move
+        }).subscribe(response => {
+            this.backendSubject.next(response);
+        });
+    }
+    declareWinner(gInfo, check, isHost) {
+        this.http.post(this.BASE_URL + "gameplay/declareWinner", {
+            gameMode: gInfo.gameType,
+            hostName: gInfo.hostName,
+            clientName: gInfo.opponentName,
+            isHost: isHost,
+            check: check
+        }).subscribe(response => {
+            this.backendSubject.next(response);
+        });
     }
     startGame(gInfo, board) {
         this.http.post(this.BASE_URL + "gameplay/startGame", {
@@ -1683,6 +1840,15 @@ class BackendService {
             hostName: gInfo.hostName,
             hostId: gInfo.userId,
             gameType: gInfo.gameType
+        }).subscribe(response => {
+            this.backendSubject.next(response);
+        });
+    }
+    deleteGameState(gameState) {
+        this.http.post(this.BASE_URL + "gameplay/deleteGameState", {
+            gameMode: gameState.gameMode,
+            hostName: gameState.hostName,
+            clientName: gameState.clientName
         }).subscribe(response => {
             this.backendSubject.next(response);
         });
@@ -1765,6 +1931,8 @@ class Board {
         this.emptyBoard();
         this.drawBoard();
     }
+    setBoardArrayFromGameState(gameState) {
+    }
     setCanvasDimensions(width = this.canvas.width, height = this.canvas.height) {
         this.canvas.width = width;
         this.canvas.height = height;
@@ -1788,23 +1956,140 @@ __webpack_require__.r(__webpack_exports__);
 
 class ConnectFourBoard extends _abstract_board__WEBPACK_IMPORTED_MODULE_0__["Board"] {
     constructor(canvas) {
-        super(canvas, 7, 6);
+        super(canvas, 6, 7);
+        this.emptySpots = 42;
+        this.unsetAndEmptySpots = 42;
+        this.drawBoardAndPieces();
     }
-    checkForWinner() {
+    checkForWinner(move) {
+        for (let r = 0; r < this.lengthOfRow; r++) {
+            let rowStr = this.getRow(r);
+            if (rowStr.includes("yyyy")) {
+                return "y";
+            }
+            else if (rowStr.includes("rrrr")) {
+                return "r";
+            }
+        }
+        for (let c = 0; c < this.lengthOfCol; c++) {
+            let colStr = this.getCol(c);
+            if (colStr.includes("yyyy")) {
+                return "y";
+            }
+            else if (colStr.includes("rrrr")) {
+                return "r";
+            }
+        }
         return "";
     }
     getBoardPiece(r, c) {
-        return { index: [], set: false, piece: "" };
+        return this.boardArray[r][c];
     }
     drawBoard() {
+        const widthOfOneSpot = this.canvas.width / this.lengthOfRow;
+        const heightOfOneSpot = this.canvas.height / this.lengthOfCol;
+        this.context.beginPath();
+        this.context.rect(0, 0, this.canvas.width, this.canvas.height);
+        this.context.fillStyle = "#5d8ed0";
+        this.context.fill();
+        let i = this.canvas.width / this.lengthOfRow;
+        while (i < this.canvas.width) {
+            this.context.beginPath();
+            this.context.moveTo(i, 0);
+            this.context.lineTo(i, this.canvas.height);
+            i += this.canvas.width / this.lengthOfRow;
+            this.context.stroke();
+        }
+        i = this.canvas.height / this.lengthOfCol;
+        //draw rows
+        while (i < this.canvas.height) {
+            this.context.beginPath();
+            this.context.moveTo(0, i);
+            this.context.lineTo(this.canvas.width, i);
+            i += this.canvas.height / this.lengthOfCol;
+            this.context.stroke();
+        }
+        i = 0;
+        let j = 0;
+        while (true) {
+            this.context.beginPath();
+            this.context.fillStyle = "white";
+            this.context.ellipse(widthOfOneSpot * (j + 0.5), heightOfOneSpot * (i + 0.5), widthOfOneSpot * 0.25, heightOfOneSpot * 0.25, 0, 0, Math.PI * 2);
+            this.context.fill();
+            i++;
+            if (i > this.lengthOfCol - 1) {
+                i = 0;
+                j++;
+            }
+            if (j > this.lengthOfRow - 1) {
+                break;
+            }
+        }
     }
     drawPieces() {
+        let i = 0;
+        let j = 0;
+        const widthOfOneSpot = this.canvas.width / this.lengthOfRow;
+        const heightOfOneSpot = this.canvas.height / this.lengthOfCol;
+        while (true) {
+            const piece = this.boardArray[i][j];
+            this.context.beginPath();
+            if (piece.piece === "r") {
+                this.context.fillStyle = "#922725";
+            }
+            else if (piece.piece === "y") {
+                this.context.fillStyle = "#CAAB04";
+            }
+            else {
+                this.context.fillStyle = "white";
+            }
+            this.context.ellipse(widthOfOneSpot * (j + 0.5), heightOfOneSpot * (i + 0.5), widthOfOneSpot * 0.25, heightOfOneSpot * 0.25, 0, 0, Math.PI * 2);
+            this.context.fill();
+            i++;
+            if (i > this.lengthOfCol - 1) {
+                i = 0;
+                j++;
+            }
+            if (j > this.lengthOfRow - 1) {
+                break;
+            }
+        }
     }
     clickBoard(x, y) {
-        return { index: [], set: false, piece: "" };
+        let i = 0;
+        let j = 0;
+        const widthOfOneSpot = this.canvas.width / this.lengthOfRow;
+        const heightOfOneSpot = this.canvas.height / this.lengthOfCol;
+        while (i < this.lengthOfCol && j < this.lengthOfRow) {
+            let checkCol = x > widthOfOneSpot * j && x < widthOfOneSpot * (j + 1);
+            let checkRow = y > heightOfOneSpot * i && y < heightOfOneSpot * (i + 1);
+            if (checkRow && checkCol) {
+                break;
+            }
+            j++;
+            if (j === this.lengthOfRow) {
+                j = 0;
+                i++;
+            }
+            if (i === this.lengthOfCol) {
+                break;
+            }
+        }
+        console.log(i, j);
+        return this.getBoardPiece(i, j);
     }
     rowColToString(rc) {
         return "";
+    }
+    getRow(r) {
+        return this.boardArray[r].map((boardPiece) => {
+            return boardPiece.piece ? boardPiece.piece : "-";
+        }).join("");
+    }
+    getCol(c) {
+        return this.boardArray.map((row) => {
+            return row[c].piece ? row[c].piece : "-";
+        }).join("");
     }
     printBoard() {
         return [];
@@ -1834,7 +2119,7 @@ class TicTacToeBoard extends _abstract_board__WEBPACK_IMPORTED_MODULE_0__["Board
         this.drawBoardAndPieces();
         console.log(this.boardArray);
     }
-    checkForWinner() {
+    checkForWinner(move) {
         const checkDiag1 = this.boardArray[0][0].piece === this.boardArray[1][1].piece &&
             this.boardArray[1][1].piece === this.boardArray[2][2].piece;
         const checkDiag2 = this.boardArray[2][0].piece === this.boardArray[1][1].piece &&
@@ -2018,42 +2303,57 @@ class GameManagerService {
         this.setGameInfo(gameInfo);
     }
     quitGame() {
-        this.clearGameInfo();
-        this.board.clearBoard();
-        this.board.emptyBoard();
-        this.pc.quitGame();
+        if (this.board) {
+            this.board.clearBoard();
+            this.board.emptyBoard();
+        }
+        if (this.pc) {
+            this.pc.quitGame();
+            this.pc = null;
+        }
         this.gameEnd = false;
         this.board = null;
-        this.pc = null;
         this.computerPiece = "";
         this.turn = "";
+        this.clearGameInfo();
     }
     startGame(canvas) {
         this.gameEnd = false;
         const ginfo = this.gameInfo;
         if (ginfo.opponentPC) {
             this.pc = new _player_player__WEBPACK_IMPORTED_MODULE_4__["ComputerPlayer"](this.computerPiece, false, ginfo.difficulty, this);
-            this.computerPiece = Math.floor(Math.random() * 2) === 0 ? "o" : "x";
-            let playerPiece = this.computerPiece === "x" ? "o" : "x";
-            this.computerPieceSubject.next(playerPiece);
-            this.turn = Math.floor(Math.random() * 2) === 0 ? "o" : "x";
-            this.playerTurnSubject.next(this.turn);
         }
         if (ginfo.gameType === "TTT") {
             this.board = new _board_ttt_board__WEBPACK_IMPORTED_MODULE_2__["TicTacToeBoard"](canvas);
+            this.computerPiece = Math.floor(Math.random() * 2) === 0 ? "o" : "x";
+            this.createBoardsAndAssignPieces("x", "o");
         }
         else if (ginfo.gameType === "CF") {
             this.board = new _board_cf_board__WEBPACK_IMPORTED_MODULE_3__["ConnectFourBoard"](canvas);
+            this.createBoardsAndAssignPieces("r", "y");
         }
     }
+    createBoardsAndAssignPieces(pieceOne, pieceTwo) {
+        this.computerPiece = Math.floor(Math.random() * 2) === 0 ? pieceOne : pieceTwo;
+        this.pc.setPiece(this.computerPiece);
+        let playerPiece = this.computerPiece === pieceOne ? pieceTwo : pieceOne;
+        this.computerPieceSubject.next(playerPiece);
+        this.turn = Math.floor(Math.random() * 2) === 0 ? pieceTwo : pieceOne;
+        this.playerTurnSubject.next(this.turn);
+    }
     endGame(check) {
-        this.gameEnd = true;
-        this.board.drawBoardAndPieces();
-        this.gameEndSubject.next(check);
+        try {
+            this.gameEnd = true;
+            this.board.drawBoardAndPieces();
+            this.gameEndSubject.next(check);
+        }
+        catch (err) {
+            console.log(err);
+        }
     }
     confirmMove(move, piece) {
         this.board.placePiece(move, piece, true);
-        let check = this.board.checkForWinner();
+        let check = this.board.checkForWinner(move);
         let movesLeft = this.board.unsetAndEmptySpots;
         if (check != "") {
             this.endGame(check);
@@ -2075,7 +2375,12 @@ class GameManagerService {
         this.board.drawBoardAndPieces();
     }
     nextTurn() {
-        this.turn = this.turn === "x" ? "o" : "x";
+        if (this.gameInfo.gameType === "TTT") {
+            this.turn = this.turn === "x" ? "o" : "x";
+        }
+        else if (this.gameInfo.gameType === "CF") {
+            this.turn = this.turn === "r" ? "y" : "r";
+        }
         this.playerTurnSubject.next(this.turn);
     }
     setGameInfo(gameInfo) {
@@ -2193,12 +2498,28 @@ class Player {
         this.gameManager = gameManager;
         this.boardArray = [];
         this.mode = mode;
+        const gInfo = this.gameManager.getGameInfo();
+        if (gInfo.gameType === "TTT") {
+            this.rows = 3;
+            this.columns = 3;
+            this.pieceOne = "x";
+            this.pieceTwo = "o";
+        }
+        else if (gInfo.gameType === "CF") {
+            this.rows = 6;
+            this.columns = 7;
+            this.pieceOne = "r";
+            this.pieceTwo = "y";
+        }
     }
     getIsHuman() {
         return this.isHuman;
     }
     getPiece() {
         return this.piece;
+    }
+    setPiece(piece) {
+        this.piece = piece;
     }
 }
 
@@ -2285,16 +2606,16 @@ class ComputerPlayer extends _abstract_player__WEBPACK_IMPORTED_MODULE_0__["Play
     }
     findBestMove() {
         let board = this.gameManager.board;
-        let bestVal = this.piece === "x" ? -1000 : 1000;
+        let bestVal = this.piece === this.pieceOne ? -1000 : 1000;
         let bestMove = [-1, -1];
-        for (let r = 0; r < 3; r++) {
-            for (let c = 0; c < 3; c++) {
+        for (let r = 0; r < this.rows; r++) {
+            for (let c = 0; c < this.columns; c++) {
                 if (board.getBoardPiece(r, c).piece === "") {
                     board.placePiece([r, c], this.piece, false);
-                    let isMaximizer = this.piece === "x" ? true : false;
+                    let isMaximizer = this.piece === this.pieceOne ? true : false;
                     let moveVal = this.miniMax(board, 0, !isMaximizer);
                     board.removePiece([r, c]);
-                    let check = this.piece === "x" ? moveVal > bestVal : moveVal < bestVal;
+                    let check = this.piece === this.pieceOne ? moveVal > bestVal : moveVal < bestVal;
                     if (check) {
                         bestMove = [r, c];
                         bestVal = moveVal;
@@ -2306,10 +2627,10 @@ class ComputerPlayer extends _abstract_player__WEBPACK_IMPORTED_MODULE_0__["Play
     }
     miniMax(board, depth, isMax) {
         const winner = board.checkForWinner();
-        if (winner === "x") {
+        if (winner === this.pieceOne) {
             return 10 - depth;
         }
-        else if (winner === "o") {
+        else if (winner === this.pieceOne) {
             return -10 + depth;
         }
         const movesLeft = board.emptySpots;
@@ -2318,10 +2639,10 @@ class ComputerPlayer extends _abstract_player__WEBPACK_IMPORTED_MODULE_0__["Play
         }
         if (isMax) {
             let bestVal = -10000;
-            for (let r = 0; r < 3; r++) {
-                for (let c = 0; c < 3; c++) {
+            for (let r = 0; r < this.rows; r++) {
+                for (let c = 0; c < this.columns; c++) {
                     if (board.getBoardPiece(r, c).piece === "") {
-                        board.placePiece([r, c], "x", false);
+                        board.placePiece([r, c], this.pieceOne, false);
                         let value = this.miniMax(board, depth + 1, !isMax);
                         value = !!value ? value : 0;
                         bestVal = Math.max(bestVal, value);
@@ -2333,10 +2654,10 @@ class ComputerPlayer extends _abstract_player__WEBPACK_IMPORTED_MODULE_0__["Play
         }
         else {
             let bestVal = 10000;
-            for (let r = 0; r < 3; r++) {
-                for (let c = 0; c < 3; c++) {
+            for (let r = 0; r < this.rows; r++) {
+                for (let c = 0; c < this.columns; c++) {
                     if (board.getBoardPiece(r, c).piece === "") {
-                        board.placePiece([r, c], "o", false);
+                        board.placePiece([r, c], this.pieceTwo, false);
                         let value = this.miniMax(board, depth + 1, !isMax);
                         value = !!value ? value : 0;
                         bestVal = Math.min(bestVal, value);

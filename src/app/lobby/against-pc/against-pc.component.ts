@@ -9,9 +9,16 @@ import { GameManagerService } from 'src/app/shared/game-manager.service';
 })
 export class AgainstPcComponent implements OnInit {
 
+
+  mode : string ;
+
   constructor(private gameManager : GameManagerService) { }
 
   ngOnInit(): void {
+  }
+
+  setMode(value : string) {
+    this.mode = value ;
   }
 
   onSubmit(form : NgForm) {

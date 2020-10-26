@@ -1,7 +1,13 @@
 const express = require("express");
+const { server } = require("karma");
 const router = express.Router();
 const GameStateModel = require("../models/gameState");
 
+const serverError = {
+    message: "Internal Server Error",
+    status: 500,
+    extra: "serverError"
+}
 
 router.post("/confirmMove", (req, res, next) => {
     GameStateModel.findOne({
@@ -22,7 +28,11 @@ router.post("/confirmMove", (req, res, next) => {
             piece: gameState.turn
         };
         //add logic for determining winner
-        gameState.turn = gameState.turn === "x" ? "o" : "x";
+        if (gameState.gameMode === "TTT") {
+            gameState.turn = gameState.turn === "x" ? "o" : "x";
+        } else if (gameState.gameMode === "CF") {
+            gameState.turn = gameState.turn === "r" ? "y" : "r";
+        }
         gameState.save()
         .then(result => {
             return res.status(200).json({
@@ -33,15 +43,11 @@ router.post("/confirmMove", (req, res, next) => {
             })
         })
         .catch(err => {
-            return res.status(500).json({
-                message: "Internal Server Error",
-                status: 500,
-                extra: "serverError"
-            })
+            return res.status(500).json(serverError)
         })
     })
     .catch(err => {
-
+        return res.status(500).json(serverError)
     })
 })
 
@@ -78,11 +84,7 @@ router.post("/check", (req, res, next) => {
                     });
                 })
                 .catch(err => {
-                    return res.status(500).json({
-                        message: "Internal Server Error",
-                        status: 500,
-                        extra: "serverError"
-                    });
+                    return res.status(500).json(serverError);
                 })
             } else if(gameState.turn === gameState.hostPiece) {
                 return res.status(200).json({
@@ -113,11 +115,7 @@ router.post("/check", (req, res, next) => {
                     });
                 })
                 .catch(err => {
-                    return res.status(500).json({
-                        message: "Internal Server Error",
-                        status: 500,
-                        extra: "serverError"
-                    });
+                    return res.status(500).json(serverError);
                 })
             } else if (gameState.turn === gameState.clientPiece) {
                 return res.status(200).json({
@@ -138,11 +136,8 @@ router.post("/check", (req, res, next) => {
 
     })
     .catch(err => {
-        return res.status(500).json({
-            message: "Internal Server Error",
-            status: 500,
-            extra: "serverError"
-        })
+        console.log(err)
+        return res.status(500).json()
     })
 })
 
@@ -150,9 +145,20 @@ router.post("/startGame", (req, res, next) => {
 
     console.log(req.body.board)
 
-    const turn = Math.floor(Math.random()*2) === 0 ? "x" : "o";
-    const hostPiece = Math.floor(Math.random()*2) === 0 ? "x" : "o";
-    const clientPiece = hostPiece === "x" ? "o" : "x";
+    let turn = "";
+    let hostPiece = "";
+    let clientPiece = "";
+
+    if (req.body.gameMode === "TTT") {
+        turn = Math.floor(Math.random()*2) === 0 ? "x" : "o";
+        hostPiece = Math.floor(Math.random()*2) === 0 ? "x" : "o";
+        clientPiece = hostPiece === "x" ? "o" : "x";
+    } else if (req.body.gameMode === "CF") {
+        turn = Math.floor(Math.random()*2) === 0 ? "r" : "y";
+        hostPiece = Math.floor(Math.random()*2) === 0 ? "r" : "y";
+        clientPiece = hostPiece === "r" ? "y" : "r";
+    }
+
 
     const gameState = GameStateModel({
         gameMode: req.body.gameMode,
@@ -170,9 +176,6 @@ router.post("/startGame", (req, res, next) => {
 
     gameState.save()
     .then(result => {
-
-
-
         return res.status(200).json({
             message: "Game Started!",
             status: 200,
@@ -182,11 +185,7 @@ router.post("/startGame", (req, res, next) => {
     })
     .catch(err => {
         console.log(err)
-        return res.status(500).json({
-            message: "Interval Server Error",
-            status: 500,
-            extra: "gameStartError"
-        })
+        return res.status(500).json(serverError)
     })
 })
 
@@ -208,20 +207,12 @@ router.post("/declareWinner", (req, res, next) => {
             })
         })
         .catch(err => {
-            return res.status.json({
-                message: "Internal Server Error",
-                status: 500,
-                extra: "serverError"
-            })            
+            return res.status.json(serverError)            
         })
 
     })
     .catch(err => {
-        return res.status.json({
-            message: "Internal Server Error",
-            status: 500,
-            extra: "serverError"
-        })
+        return res.status(500).json(serverError)
     })
 })
 
@@ -240,11 +231,7 @@ router.post("/deleteGame", (req, res, next) => {
         })
     })
     .catch(err => {
-        return res.status(500).json({
-            message: "Internal Server Error",
-            status: 500,
-            extra: "serverError"
-        })
+        return res.status(500).json(serverError)
     })
 }) 
 
@@ -263,9 +250,7 @@ router.post("/getGameState", (req, res, next) => {
         })
     })
     .catch(err => {
-        return res.status(500).json({
-
-        })
+        return res.status(500).json(serverError)
     })
 })
 
@@ -284,11 +269,7 @@ router.post("/deleteGameState", (req, res, next) => {
         })
     })
     .catch(err => {
-        return res.status(500).json({
-            message: "Internal Server Error",
-            status: 500,
-            extra: "serverError"            
-        })
+        return res.status(500).json(serverError)
     })
 
 })

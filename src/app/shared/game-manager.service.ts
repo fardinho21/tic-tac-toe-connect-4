@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Subject } from "rxjs";
 import { TicTacToeBoard } from "./board/ttt-board";
-import { ConnectFourBoard} from "./board/cf-board";
+import { ConnectFourBoard } from "./board/cf-board";
 import { ComputerPlayer } from "./player/player";
 
 @Injectable({
@@ -71,21 +71,23 @@ export class GameManagerService {
 
     if (ginfo.gameType === "TTT") {
       this.board = new TicTacToeBoard(canvas);
-      this.computerPiece = Math.floor(Math.random()*2) === 0 ? "o" : "x";
-      let playerPiece = this.computerPiece === "x" ? "o" : "x";
-      this.computerPieceSubject.next(playerPiece);
-      this.turn = Math.floor(Math.random()*2) === 0 ? "o" : "x"
-      this.playerTurnSubject.next(this.turn);
+      this.createBoardsAndAssignPieces("x","o")
     } else if (ginfo.gameType === "CF") {
       this.board = new ConnectFourBoard(canvas);
-      this.computerPiece = Math.floor(Math.random()*2) === 0 ? "r" : "y";
-      let playerPiece = this.computerPiece === "r" ? "y" : "r";
-      this.computerPieceSubject.next(playerPiece);
-      this.turn = Math.floor(Math.random()*2) === 0 ? "r" : "y"
-      this.playerTurnSubject.next(this.turn);
+      this.createBoardsAndAssignPieces("r","y")
     }
     
 
+  }
+
+  createBoardsAndAssignPieces(pieceOne: string, pieceTwo: string) {
+    this.computerPiece = Math.floor(Math.random()*2) === 0 ? pieceOne : pieceTwo;
+    this.pc.setPiece(this.computerPiece);
+    let playerPiece = this.computerPiece === pieceOne ? pieceTwo : pieceOne;
+    this.computerPieceSubject.next(playerPiece);
+    this.turn = Math.floor(Math.random()*2) === 0 ? pieceTwo : pieceOne;
+    this.playerTurnSubject.next(this.turn);
+    
   }
 
   endGame(check : string) {
@@ -101,7 +103,7 @@ export class GameManagerService {
 
   confirmMove(move : number[], piece: string) {
     this.board.placePiece(move,piece,true);
-    let check = this.board.checkForWinner();
+    let check = this.board.checkForWinner(move);
     let movesLeft = this.board.unsetAndEmptySpots;
     if (check != "") {
       this.endGame(check)
